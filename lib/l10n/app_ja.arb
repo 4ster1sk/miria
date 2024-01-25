@@ -965,5 +965,8 @@
     "createdAtAscendingOrder": "古い順",
     "createdAtDescendingOrder": "新しい順",
     "updatedAtAscendingOrder": "更新されていない順",
-    "updatedAtDescendingOrder": "更新された順"
+    "updatedAtDescendingOrder": "更新された順",
+
+    "refresh": "更新",
+    "cacheManualUpdateCompleted": "情報の取得が完了したで"
 }

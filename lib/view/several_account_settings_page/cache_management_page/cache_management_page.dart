@@ -27,6 +27,8 @@ class CacheManagementPageState extends ConsumerState<CacheManagementPage> {
   CacheStrategy emojisCacheStrategy = CacheStrategy.whenLaunch;
   CacheStrategy metaCacheStrategy = CacheStrategy.whenOneDay;
 
+  bool isEnabledRefreshButton = true;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -60,6 +62,24 @@ class CacheManagementPageState extends ConsumerState<CacheManagementPage> {
           metaChacheStrategy: metaCacheStrategy,
           emojiCacheStrategy: emojisCacheStrategy,
         ));
+  }
+
+  Future<void> refresh() async {
+    setState(() {
+      isEnabledRefreshButton = false;
+    });
+    await ref.read(emojiRepositoryProvider(widget.account)).loadFromSource();
+    await ref.read(accountRepositoryProvider.notifier).updateI(widget.account);
+    await ref
+        .read(accountRepositoryProvider.notifier)
+        .updateMeta(widget.account);
+    if (!context.mounted) return;
+    setState(() {
+      isEnabledRefreshButton = true;
+    });
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(S.of(context).cacheManualUpdateCompleted)));
   }
 
   @override
@@ -114,6 +134,41 @@ class CacheManagementPageState extends ConsumerState<CacheManagementPage> {
                     save();
                   }),
                 ),
+                const Padding(padding: EdgeInsets.only(top: 20)),
+                (isEnabledRefreshButton)
+                  ? ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: refresh,
+                    label: Text(S.of(context).refresh),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(5),
+                      minimumSize: const Size(double.infinity, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap))
+                  : OutlinedButton(
+                    onPressed: null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(5),
+                      minimumSize: const Size(double.infinity, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.fontSize ??
+                              22,
+                          height: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.fontSize ??
+                              22,
+                          child: const CircularProgressIndicator()),
+                        const SizedBox(width:10),
+                        Text(S.of(context).refreshing)
+                      ]),
+                    ),
               ],
             )),
       ),
