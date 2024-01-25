@@ -101,8 +101,9 @@
     "pleaseSpecifyExpirationDate": "投票がいつまでか入れてくださいまし？",
     "pleaseSpecifyExpirationDuration": "投票期間を入れてくださいまし？",
     "cannotMentionToRemoteInLocalOnlyNote": "連合切られているのに他のサーバーの人がメンションに含まれているようですわ",
-    "cannotPublicReplyToPrivateNote": "リプライが{visibility}のようでして……パブリックにはできませんこと"
+    "cannotPublicReplyToPrivateNote": "リプライが{visibility}のようでして……パブリックにはできませんこと",
 
+    "cacheManualUpdateCompleted": "情報の取得が完了致しましたわ"
 
 
 
