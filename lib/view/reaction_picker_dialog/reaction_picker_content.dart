@@ -100,6 +100,7 @@ class EmojiButton extends ConsumerStatefulWidget {
   final FutureOr Function(MisskeyEmojiData emoji) onTap;
   final bool isForceVisible;
   final bool isAcceptSensitive;
+  final bool isSelect;
 
   const EmojiButton({
     super.key,
@@ -107,6 +108,7 @@ class EmojiButton extends ConsumerStatefulWidget {
     required this.onTap,
     this.isForceVisible = false,
     required this.isAcceptSensitive,
+    this.isSelect = false,
   });
 
   @override
@@ -136,7 +138,9 @@ class EmojiButtonState extends ConsumerState<EmojiButton> {
             : const BoxDecoration(),
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+            backgroundColor: MaterialStatePropertyAll((widget.isSelect)
+                ? Theme.of(context).primaryColor.withOpacity(0.5)
+                : Colors.transparent),
             padding: MaterialStatePropertyAll(EdgeInsets.all(5)),
             elevation: MaterialStatePropertyAll(0),
             minimumSize: MaterialStatePropertyAll(Size.zero),
@@ -186,6 +190,8 @@ class EmojiSearch extends ConsumerStatefulWidget {
 class EmojiSearchState extends ConsumerState<EmojiSearch> {
   final emojis = <MisskeyEmojiData>[];
 
+  int index = -1;
+
   EmojiRepository get emojiRepository =>
       ref.read(emojiRepositoryProvider(AccountScope.of(context)));
 
@@ -205,6 +211,13 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   @override
   void initState() {
     super.initState();
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        setState(() {
+          index = -1;
+        });
+      }
+    });
   }
 
   @override
@@ -221,15 +234,33 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
               .settings
               .reactionSearchAutofocus,
           keyboardType: TextInputType.emailAddress,
+          onSubmitted: (value) {
+            if (emojis.length > index) {
+              widget.onTap(emojis[index]);
+            }
+          },
           onChanged: (value) {
-            Future(() async {
-              final result = await emojiRepository.searchEmojis(value);
-              if (!mounted) return;
+            if (value.endsWith(" ")) {
+              textController.text = value.substring(0, value.length - 1);
               setState(() {
-                emojis.clear();
-                emojis.addAll(result);
+                index++;
+                if (index > emojis.length) {
+                  index = 0;
+                }
               });
-            });
+            } else {
+              index = -1;
+              Future(() async {
+                print(value);
+                final result = await emojiRepository.searchEmojis(value);
+                if (!mounted) return;
+                setState(() {
+                  emojis.clear();
+                  emojis.addAll(result);
+                });
+                
+              });
+            }
           },
         )),
         if (Platform.isAndroid || Platform.isIOS)
@@ -263,12 +294,13 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
             runSpacing: 5,
             crossAxisAlignment: WrapCrossAlignment.start,
             children: [
-              for (final emoji in emojis)
+              for (int i = 0; emojis.length > i; i++)
                 EmojiButton(
-                  emoji: emoji,
+                  emoji: emojis[i],
                   onTap: widget.onTap,
                   isForceVisible: true,
                   isAcceptSensitive: widget.isAcceptSensitive,
+                  isSelect: (index == i),
                 )
             ],
           ))
