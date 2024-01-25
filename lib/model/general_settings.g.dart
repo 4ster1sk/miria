@@ -36,6 +36,7 @@ _$GeneralSettingsImpl _$$GeneralSettingsImplFromJson(
       monospaceFontName: json['monospaceFontName'] as String? ?? "",
       cursiveFontName: json['cursiveFontName'] as String? ?? "",
       fantasyFontName: json['fantasyFontName'] as String? ?? "",
+      reactionSearchAutofocus: json['reactionSearchAutofocus'] as bool? ?? true,
       languages: $enumDecodeNullable(_$LanguagesEnumMap, json['languages']) ??
           Languages.jaJP,
     );
@@ -60,6 +61,7 @@ Map<String, dynamic> _$$GeneralSettingsImplToJson(
       'monospaceFontName': instance.monospaceFontName,
       'cursiveFontName': instance.cursiveFontName,
       'fantasyFontName': instance.fantasyFontName,
+      'reactionSearchAutofocus': instance.reactionSearchAutofocus,
       'languages': _$LanguagesEnumMap[instance.languages]!,
     };
 

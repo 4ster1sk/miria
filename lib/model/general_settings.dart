@@ -130,6 +130,8 @@ class GeneralSettings with _$GeneralSettings {
 
     /// `$[font.fantasy のフォント名
     @Default("") String fantasyFontName,
+    
+    @Default(true) bool reactionSearchAutofocus,
 
     /// 言語設定
     @Default(Languages.jaJP) Languages languages,

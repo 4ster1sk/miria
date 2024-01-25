@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miria/model/misskey_emoji_data.dart';
 import 'package:miria/providers.dart';
 import 'package:miria/repository/emoji_repository.dart';
+import 'package:miria/repository/general_settings_repository.dart';
 import 'package:miria/view/common/account_scope.dart';
 import 'package:miria/view/common/misskey_notes/custom_emoji.dart';
 import 'package:miria/view/dialogs/simple_message_dialog.dart';
@@ -178,8 +180,7 @@ class EmojiSearch extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      EmojiSearchState();
+  ConsumerState<ConsumerStatefulWidget> createState() => EmojiSearchState();
 }
 
 class EmojiSearchState extends ConsumerState<EmojiSearch> {
@@ -187,6 +188,12 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
 
   EmojiRepository get emojiRepository =>
       ref.read(emojiRepositoryProvider(AccountScope.of(context)));
+
+  GeneralSettingsRepository get generalSettingsRepository =>
+      ref.read(generalSettingsRepositoryProvider);
+
+  TextEditingController textController = TextEditingController();
+  FocusNode focusNode = FocusNode();
 
   @override
   void didChangeDependencies() {
@@ -196,23 +203,58 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(children: [
-      TextField(
-        decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-        autofocus: true,
-        keyboardType: TextInputType.emailAddress,
-        onChanged: (value) {
-          Future(() async {
-            final result = await emojiRepository.searchEmojis(value);
-            if (!mounted) return;
-            setState(() {
-              emojis.clear();
-              emojis.addAll(result);
+      Row(children: [
+        Expanded(
+            child: TextField(
+          controller: textController,
+          focusNode: focusNode,
+          decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+          autofocus: ref
+              .read(generalSettingsRepositoryProvider)
+              .settings
+              .reactionSearchAutofocus,
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (value) {
+            Future(() async {
+              final result = await emojiRepository.searchEmojis(value);
+              if (!mounted) return;
+              setState(() {
+                emojis.clear();
+                emojis.addAll(result);
+              });
             });
-          });
-        },
-      ),
+          },
+        )),
+        if (Platform.isAndroid || Platform.isIOS)
+          IconButton(
+            onPressed: () => {
+              setState(() {
+                final f =
+                    !generalSettingsRepository.settings.reactionSearchAutofocus;
+                final settings = generalSettingsRepository.settings
+                    .copyWith(reactionSearchAutofocus: f);
+                generalSettingsRepository.update(settings);
+                if (f) {
+                  focusNode.requestFocus();
+                } else {
+                  primaryFocus?.unfocus();
+                }
+              })
+            },
+            icon: Icon(Icons.keyboard,
+                color:
+                    (generalSettingsRepository.settings.reactionSearchAutofocus)
+                        ? Theme.of(context).primaryColor
+                        : null),
+          )
+      ]),
       const Padding(padding: EdgeInsets.only(top: 10)),
       Align(
           alignment: Alignment.topLeft,
