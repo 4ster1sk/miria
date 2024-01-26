@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miria/model/misskey_emoji_data.dart';
 import 'package:miria/providers.dart';
@@ -191,6 +192,7 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   final emojis = <MisskeyEmojiData>[];
 
   int index = -1;
+  bool isInit = false;
 
   EmojiRepository get emojiRepository =>
       ref.read(emojiRepositoryProvider(AccountScope.of(context)));
@@ -201,11 +203,15 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   TextEditingController textController = TextEditingController();
   FocusNode focusNode = FocusNode();
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    emojis.clear();
-    emojis.addAll(emojiRepository.defaultEmojis().toList());
+    if (!isInit) {
+      emojis.clear();
+      emojis.addAll(emojiRepository.defaultEmojis().toList());
+      isInit = true;
+    }
   }
 
   @override
@@ -223,46 +229,47 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Row(children: [
-        Expanded(
+      Row(
+        children: [
+          Expanded(
             child: TextField(
-          controller: textController,
-          focusNode: focusNode,
-          decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-          autofocus: ref
-              .read(generalSettingsRepositoryProvider)
-              .settings
-              .reactionSearchAutofocus,
-          keyboardType: TextInputType.emailAddress,
-          onSubmitted: (value) {
-            if (emojis.length > index) {
-              widget.onTap(emojis[index]);
-            }
-          },
-          onChanged: (value) {
-            if (value.endsWith(" ")) {
-              textController.text = value.substring(0, value.length - 1);
-              setState(() {
-                index++;
-                if (index > emojis.length) {
-                  index = 0;
-                }
-              });
-            } else {
-              index = -1;
-              Future(() async {
-                print(value);
-                final result = await emojiRepository.searchEmojis(value);
-                if (!mounted) return;
-                setState(() {
-                  emojis.clear();
-                  emojis.addAll(result);
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              controller: textController,
+              focusNode: focusNode,
+              decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+              autofocus: ref
+                  .read(generalSettingsRepositoryProvider)
+                  .settings
+                  .reactionSearchAutofocus,
+              inputFormatters: [
+                _EmojiSearchInputFormatter(
+                  onSpaceKey: (value) => {
+                    setState(() {
+                      index++;
+                      if (index > emojis.length) {
+                        index = 0;
+                      }
+                    })
+                  },
+                  onEnterKey: (value) => {
+                        if (index >= 0 && emojis.length > index)
+                          {widget.onTap(emojis[index])}
+                      }),
+                  FilteringTextInputFormatter.deny(RegExp('\n| |　')),
+                ],
+              onChanged: (value) {
+                index = -1;
+                Future(() async {
+                  final result = await emojiRepository.searchEmojis(value);
+                  if (!mounted) return;
+                  setState(() {
+                    emojis.clear();
+                    emojis.addAll(result);
+                  });
                 });
-                
-              });
-            }
-          },
-        )),
+              },
+            )),
         if (Platform.isAndroid || Platform.isIOS)
           IconButton(
             onPressed: () => {
@@ -305,5 +312,26 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
             ],
           ))
     ]);
+  }
+}
+
+class _EmojiSearchInputFormatter extends TextInputFormatter {
+  final void Function(TextEditingValue value) onSpaceKey;
+  final void Function(TextEditingValue value) onEnterKey;
+
+  _EmojiSearchInputFormatter(
+      {required this.onSpaceKey, required this.onEnterKey});
+
+  @override
+  TextEditingValue formatEditUpdate(oldValue, newValue) {
+    if (newValue.text.endsWith('\n')) {
+      onEnterKey(newValue);
+      return newValue;
+    }
+    if (newValue.text.endsWith(' ') || newValue.text.endsWith('　') ) {
+      onSpaceKey(newValue);
+      return newValue;
+    }
+    return newValue;
   }
 }
