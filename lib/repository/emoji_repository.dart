@@ -17,7 +17,7 @@ abstract class EmojiRepository {
   Future<void> loadFromSource();
 
   Future<void> loadFromLocalCache();
-  Future<List<MisskeyEmojiData>> searchEmojis(String name, {int limit = 30});
+  Future<List<MisskeyEmojiData>> searchEmojis(String name, {int limit = 30, bool isExclude = false});
   List<MisskeyEmojiData> defaultEmojis({int limit});
 }
 
@@ -162,12 +162,16 @@ class EmojiRepositoryImpl extends EmojiRepository {
 
   @override
   Future<List<MisskeyEmojiData>> searchEmojis(String name,
-      {int limit = 30}) async {
+      {int limit = 30, bool isExclude = false}) async {
     if (name == "") {
       return defaultEmojis(limit: limit);
     }
 
     final converted = format(const KanaKit().toHiragana(name));
+
+    final excludeReactions = (isExclude)
+        ? accountSettingsRepository.fromAccount(account).excludeReactions
+        : [];
 
     return emoji
             ?.where((element) => emojiSearchCondition(name, converted, element))
@@ -190,6 +194,8 @@ class EmojiRepositoryImpl extends EmojiRepository {
               if (a.emoji is CustomEmojiData) return -1;
               return 0;
             })
+            .where(
+                (element) => !excludeReactions.contains(element.emoji.baseName))
             .take(limit)
             .map((e) => e.emoji)
             .toList() ??

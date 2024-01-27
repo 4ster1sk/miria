@@ -40,6 +40,14 @@ class SeveralAccountSettingsPage extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
+              context.pushRoute(ReactionSearchExcludeRoute(account: account));
+            },
+            title: Text(S.of(context).reactionExclude),
+            leading: const Icon(Icons.shield),
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          ListTile(
+            onTap: () {
               context.pushRoute(
                   WordMuteRoute(account: account, muteType: MuteType.soft));
             },

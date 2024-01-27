@@ -847,6 +847,7 @@
     "pleaseSelectRole": "ロールを選択してください。",
 
     "reactionDeck": "リアクションデッキ",
+    "reactionExclude": "リアクション検索除外設定",
     "wordMute": "ワードミュート",
     "hardWordMute": "ハードワードミュート",
     "instanceMute": "インスタンスミュート",

@@ -16,11 +16,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class ReactionPickerContent extends ConsumerStatefulWidget {
   final FutureOr Function(MisskeyEmojiData emoji) onTap;
   final bool isAcceptSensitive;
+  final bool isAllowExclude;
 
   const ReactionPickerContent({
     super.key,
     required this.onTap,
     required this.isAcceptSensitive,
+    required this.isAllowExclude,
   });
 
   @override
@@ -55,6 +57,7 @@ class ReactionPickerContentState extends ConsumerState<ReactionPickerContent> {
           EmojiSearch(
             onTap: widget.onTap,
             isAcceptSensitive: widget.isAcceptSensitive,
+            isAllowExclude: widget.isAllowExclude,
           ),
           ListView.builder(
             shrinkWrap: true,
@@ -170,11 +173,13 @@ class EmojiButtonState extends ConsumerState<EmojiButton> {
 class EmojiSearch extends ConsumerStatefulWidget {
   final FutureOr Function(MisskeyEmojiData emoji) onTap;
   final bool isAcceptSensitive;
+  final bool isAllowExclude;
 
   const EmojiSearch({
     super.key,
     required this.onTap,
     required this.isAcceptSensitive,
+    required this.isAllowExclude,
   });
 
   @override
@@ -204,7 +209,7 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
         keyboardType: TextInputType.emailAddress,
         onChanged: (value) {
           Future(() async {
-            final result = await emojiRepository.searchEmojis(value);
+            final result = await emojiRepository.searchEmojis(value, isExclude: widget.isAllowExclude);
             if (!mounted) return;
             setState(() {
               emojis.clear();
