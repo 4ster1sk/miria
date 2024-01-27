@@ -971,6 +971,15 @@
     "createdAtDescendingOrder": "新しい順",
     "updatedAtAscendingOrder": "更新されていない順",
     "updatedAtDescendingOrder": "更新された順",
+    
+    "showNotification": "表示する通知種別",
+    "withReaction": "リアクションも",
+    "withFollow": "フォローも",
+    "withRenote": "リノートも",
+    "withUserNote": "ユーザの新規投稿も",
+    "withOther": "他も",
+
+    "unmarkAll": "全部外す",
 
     "misskeyGames": "Misskey Games",
     "cookieCliker": "Cookie Cliker",
@@ -987,5 +996,4 @@
         }
     },
     "nonInvitedReversi": "招待はされとらへんみたいや"
-
 }

@@ -1,10 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:highlighting/languages/q.dart';
 import 'package:miria/extensions/date_time_extension.dart';
 import 'package:miria/model/account.dart';
 import 'package:miria/model/misskey_emoji_data.dart';
+import 'package:miria/model/notification_filter_settings.dart';
 import 'package:miria/providers.dart';
+import 'package:miria/view/notification_page/notification_filter_dialog.dart';
 import 'package:miria/view/notification_page/notification_page_data.dart';
 import 'package:miria/view/common/account_scope.dart';
 import 'package:miria/view/common/error_dialog_handler.dart';
@@ -29,6 +32,44 @@ class NotificationPage extends ConsumerStatefulWidget {
 }
 
 class NotificationPageState extends ConsumerState<NotificationPage> {
+  NotificationFilterSettings settings = const NotificationFilterSettings();
+
+  List<NotificationType> getNotificationTypes() {
+    List<NotificationType> l = [];
+    if (!settings.withReaction) {
+      l.addAll([NotificationType.reaction]);
+    }
+    if (!settings.withFollow) {
+      l.addAll([
+        NotificationType.follow,
+        NotificationType.followRequestAccepted,
+        NotificationType.receiveFollowRequest
+      ]);
+    }
+    if (!settings.withUserNote) {
+      l.add(NotificationType.note);
+    }
+    if (!settings.withRenote) {
+      l.addAll([NotificationType.renote, NotificationType.quote]);
+    }
+    if (!settings.withOther) {
+      l.addAll([
+        NotificationType.mention,
+        NotificationType.reply,
+        NotificationType.pollEnded,
+        NotificationType.receiveFollowRequest,
+        NotificationType.followRequestAccepted,
+        NotificationType.achievementEarned,
+        NotificationType.app,
+        NotificationType.test,
+        // obsolete
+        NotificationType.pollVote,
+        NotificationType.groupInvited,
+      ]);
+    }
+    return l;
+  }
+
   @override
   Widget build(BuildContext context) {
     final misskey = ref.read(misskeyProvider(widget.account));
@@ -38,6 +79,22 @@ class NotificationPageState extends ConsumerState<NotificationPage> {
         account: widget.account,
         child: Scaffold(
           appBar: AppBar(
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    final s = await showDialog<NotificationFilterSettings>(
+                        context: context,
+                        builder: (context) => NotificationFilterDialog(
+                            initialSettings: settings));
+                    if (s != null) {
+                      setState(() {
+                        settings = s;
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.filter_alt),
+                )
+              ],
               title: Text(S.of(context).notification),
               bottom: TabBar(tabs: [
                 Tab(text: S.of(context).notificationAll),
@@ -49,12 +106,14 @@ class NotificationPageState extends ConsumerState<NotificationPage> {
             child: TabBarView(
               children: [
                 PushableListView<NotificationData>(
+                  listKey: Object.hashAll([settings]),
                   initializeFuture: () async {
                     final localize = S.of(context);
-                    final result = await misskey.i
-                        .notifications(const INotificationsRequest(
+                    final result =
+                        await misskey.i.notifications(INotificationsRequest(
                       limit: 50,
                       markAsRead: true,
+                      excludeTypes: getNotificationTypes(),
                     ));
                     ref
                         .read(notesProvider(widget.account))
@@ -69,7 +128,9 @@ class NotificationPageState extends ConsumerState<NotificationPage> {
                     final localize = S.of(context);
                     final result = await misskey.i.notifications(
                         INotificationsRequest(
-                            limit: 50, untilId: lastElement.id));
+                            limit: 50,
+                            untilId: lastElement.id,
+                            excludeTypes: getNotificationTypes()));
                     ref
                         .read(notesProvider(widget.account))
                         .registerAll(result.map((e) => e.note).whereNotNull());
