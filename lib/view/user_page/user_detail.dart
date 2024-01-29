@@ -210,7 +210,7 @@ class UserDetailState extends ConsumerState<UserDetail> {
     return Column(children: [
       if (widget.controlAccount == null)
         Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(top: 5, right: 10),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,9 +219,7 @@ class UserDetailState extends ConsumerState<UserDetail> {
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Wrap(
+                      child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             if (user.isRenoteMuted)
@@ -281,28 +279,24 @@ class UserDetailState extends ConsumerState<UserDetail> {
                                   ),
                                 )
                             else
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: SizedBox(
-                                    width: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.fontSize ??
-                                        22,
-                                    height: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.fontSize ??
-                                        22,
-                                    child: const CircularProgressIndicator(),
-                                  ),
-                                  label: Text(S.of(context).refreshing),
-                                ),
+                            TextButton.icon(
+                              onPressed: () {},
+                              icon: SizedBox(
+                                width: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.fontSize ??
+                                    22,
+                                height: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.fontSize ??
+                                    22,
+                                child: const CircularProgressIndicator(),
                               ),
-                          ],
-                        ),
+                              label: Text(S.of(context).refreshing),
+                            ),
+                        ],
                       ),
                     ),
                   )
