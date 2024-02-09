@@ -326,6 +326,7 @@ class UserDetailState extends ConsumerState<UserDetail> {
               AvatarIcon(
                 user: response,
                 height: 80,
+                isVisibleOnlineStatus: true,
               ),
               Expanded(
                 child: Padding(

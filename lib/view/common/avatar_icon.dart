@@ -11,12 +11,14 @@ class AvatarIcon extends StatefulWidget {
   final User user;
   final double height;
   final VoidCallback? onTap;
+  final bool isVisibleOnlineStatus;
 
   const AvatarIcon({
     super.key,
     required this.user,
     this.height = 48,
     this.onTap,
+    this.isVisibleOnlineStatus = false,
   });
 
   @override
@@ -53,6 +55,18 @@ class AvatarIconState extends State<AvatarIcon> {
   @override
   Widget build(BuildContext context) {
     final baseHeight = MediaQuery.textScalerOf(context).scale(widget.height);
+    final Color statusColor;
+    switch (widget.user.onlineStatus) {
+      case OnlineStatus.online:
+        statusColor = const Color.fromARGB(255, 88, 212, 201); // #58d4c9
+      case OnlineStatus.active:
+        statusColor = const Color.fromARGB(255, 228, 188, 72); // #e4bc48
+      case OnlineStatus.offline:
+        statusColor = const Color.fromARGB(255, 234, 83, 83); // #ea5353
+      case OnlineStatus.unknown:
+      case null:
+        statusColor = const Color.fromARGB(255, 136, 136, 136); // #888
+    }
 
     return GestureDetector(
       onTap: widget.onTap ??
@@ -153,6 +167,27 @@ class AvatarIconState extends State<AvatarIcon> {
                   ),
                 ),
               ),
+          if (widget.isVisibleOnlineStatus)
+            Positioned(
+              left: 0,
+              top: 0,
+              width: baseHeight * 0.25,
+              height: baseHeight * 0.25,
+              child: Transform.translate(
+                offset: Offset(
+                  -baseHeight * 0.02,
+                  baseHeight * 0.78,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: statusColor,
+                      border: Border.all(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          width: baseHeight * 0.03)),
+                ),
+              ),
+            ),
           ],
         ),
       ),

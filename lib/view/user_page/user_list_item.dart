@@ -34,7 +34,7 @@ class UserListItem extends ConsumerWidget {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AvatarIcon(user: user),
+            AvatarIcon(user: user, isVisibleOnlineStatus: true),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 10),
