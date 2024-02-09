@@ -45,6 +45,7 @@ class UserFollowerPage extends ConsumerWidget {
           itemBuilder: (context, item) => UserListItem(
             user: item.follower!,
             isDetail: true,
+            isVisibleOnlineStatus: true,
           ),
         ),
       ),

@@ -11,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class UserListItem extends ConsumerWidget {
   final User user;
   final bool isDetail;
+  final bool isVisibleOnlineStatus;
 
   final void Function()? onTap;
 
@@ -19,6 +20,7 @@ class UserListItem extends ConsumerWidget {
     required this.user,
     this.onTap,
     this.isDetail = false,
+    this.isVisibleOnlineStatus = false,
   });
 
   @override
@@ -34,7 +36,7 @@ class UserListItem extends ConsumerWidget {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AvatarIcon(user: user, isVisibleOnlineStatus: true),
+            AvatarIcon(user: user, isVisibleOnlineStatus: isVisibleOnlineStatus),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 10),

@@ -60,6 +60,7 @@ class ExploreRoleUsersPage extends ConsumerWidget {
                 itemBuilder: (context, item) => UserListItem(
                   user: item.user,
                   isDetail: true,
+                  isVisibleOnlineStatus: true,
                 ),
               ),
               PushableListView(

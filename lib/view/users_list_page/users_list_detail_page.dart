@@ -187,7 +187,7 @@ class UsersListDetailPage extends ConsumerWidget {
                         return Row(
                           children: [
                             Expanded(
-                              child: UserListItem(user: user),
+                              child: UserListItem(user: user,isVisibleOnlineStatus: true),
                             ),
                             IconButton(
                               icon: const Icon(Icons.close),

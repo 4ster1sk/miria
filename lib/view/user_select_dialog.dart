@@ -169,6 +169,7 @@ class UsersSelectContentList extends ConsumerWidget {
         user: item,
         isDetail: isDetail,
         onTap: () => onSelected.call(item),
+        isVisibleOnlineStatus: true,
       ),
     );
   }

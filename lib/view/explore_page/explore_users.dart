@@ -130,6 +130,7 @@ class ExploreUsersState extends ConsumerState<ExploreUsers> {
                 itemBuilder: (context, index) => UserListItem(
                   user: pinnedUser[index],
                   isDetail: true,
+                  isVisibleOnlineStatus: true,
                 ),
               ),
             )
@@ -167,6 +168,7 @@ class ExploreUsersState extends ConsumerState<ExploreUsers> {
                 itemBuilder: (context, user) => UserListItem(
                   user: user,
                   isDetail: true,
+                  isVisibleOnlineStatus: true,
                 ),
               ),
             )

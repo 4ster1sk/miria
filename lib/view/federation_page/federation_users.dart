@@ -34,6 +34,7 @@ class FederationUsers extends ConsumerWidget {
       itemBuilder: (context, user) => UserListItem(
         user: user,
         isDetail: true,
+        isVisibleOnlineStatus: true,
       ),
     );
   }
