@@ -1,5 +1,8 @@
+import 'dart:collection';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mfm_parser/mfm_parser.dart' hide MfmText;
@@ -32,84 +35,153 @@ class MisskeyPagePage extends ConsumerWidget {
     required this.page,
   });
 
+  List<String> _getNoteIds(misskey.AbstractPageContent content) {
+    List<String> l = [];
+    if (content is misskey.PageSection) {
+      for (final c in content.children) {
+        l.addAll(_getNoteIds(c));
+      }
+    } else if (content is misskey.PageNote) {
+      l.add(content.note);
+    }
+    return l;
+  }
+
+  Widget buildContent(BuildContext context,
+      AsyncSnapshot<HashMap<String, misskey.Note>> snapshot) {
+    return Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: CustomScrollView(
+                slivers: (snapshot.hasData)
+                    ? [
+                        SliverToBoxAdapter(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                              MfmText(
+                                  mfmText: page.title,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall),
+                              MfmText(
+                                  mfmText: page.summary ?? "",
+                                  style: Theme.of(context).textTheme.bodySmall),
+                              const Divider(),
+                              if (page.eyeCatchingImage != null)
+                                NetworkImageView(
+                                    url: page.eyeCatchingImage!.url,
+                                    type: ImageType.image),
+                            ])),
+                        _NoteScope(
+                            notes: snapshot.data!,
+                            child: SliverList.builder(
+                                itemCount: page.content.length,
+                                itemBuilder: (context, index) => PageContent(
+                                      content: page.content![index],
+                                      page: page,
+                                    ))),
+                        SliverToBoxAdapter(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                              const Divider(),
+                              Text(S.of(context).pageWrittenBy),
+                              UserListItem(user: page.user),
+                              Row(
+                                children: [
+                                  PageLikeButton(
+                                    initialLiked: page.isLiked ?? false,
+                                    likeCount: page.likedCount,
+                                    pageId: page.id,
+                                    userId: page.userId,
+                                  ),
+                                  const Padding(
+                                      padding: EdgeInsets.only(left: 10)),
+                                  GestureDetector(
+                                    onTap: () => launchUrl(
+                                        Uri(
+                                            scheme: "https",
+                                            host: account.host,
+                                            pathSegments: [
+                                              "@${page.user.username}",
+                                              "pages",
+                                              page.name
+                                            ]),
+                                        mode: LaunchMode.externalApplication),
+                                    child: Text(
+                                      S.of(context).openBrowsers,
+                                      style: AppTheme.of(context).linkStyle,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(S
+                                            .of(context)
+                                            .pageCreatedAt(page.createdAt)),
+                                        Text(S
+                                            .of(context)
+                                            .pageUpdatedAt(page.updatedAt)),
+                                      ]))
+                            ]))
+                      ]
+                    : [
+                        const SliverPadding(
+                            padding: EdgeInsets.all(20),
+                            sliver: SliverToBoxAdapter(
+                                child: Center(
+                              child: CircularProgressIndicator(),
+                            ))),
+                      ])));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AccountScope(
         account: account,
         child: Scaffold(
-          appBar: AppBar(title: Text(S.of(context).page)),
-          body: Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      MfmText(
-                          mfmText: page.title,
-                          style: Theme.of(context).textTheme.headlineSmall),
-                      MfmText(
-                          mfmText: page.summary ?? "",
-                          style: Theme.of(context).textTheme.bodySmall),
-                      const Divider(),
-                      if (page.eyeCatchingImage != null)
-                        NetworkImageView(
-                            url: page.eyeCatchingImage!.url,
-                            type: ImageType.image),
-                      for (final content in page.content)
-                        PageContent(content: content, page: page),
-                      const Divider(),
-                      Text(S.of(context).pageWrittenBy),
-                      UserListItem(user: page.user),
-                      Row(
-                        children: [
-                          PageLikeButton(
-                            initialLiked: page.isLiked ?? false,
-                            likeCount: page.likedCount,
-                            pageId: page.id,
-                            userId: page.userId,
-                          ),
-                          const Padding(padding: EdgeInsets.only(left: 10)),
-                          GestureDetector(
-                            onTap: () => launchUrl(Uri(
-                                scheme: "https",
-                                host: account.host,
-                                pathSegments: [
-                                  "@${page.user.username}",
-                                  "pages",
-                                  page.name
-                                ])),
-                            child: Text(
-                              S.of(context).openBrowsers,
-                              style: AppTheme.of(context).linkStyle,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(S.of(context).pageCreatedAt(page.createdAt)),
-                            Text(S.of(context).pageUpdatedAt(page.updatedAt)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ));
+            appBar: AppBar(title: Text(S.of(context).page)),
+            body: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                child: Align(
+                    alignment: Alignment.topCenter,
+                    child: FutureBuilder(
+                      future: (() async {
+                        final notes = HashMap<String, misskey.Note>();
+                        for (final content in page.content) {
+                          for (final noteId in _getNoteIds(content).toSet()) {
+                            try {
+                              final note = await ref
+                                  .read(misskeyProvider(account))
+                                  .notes
+                                  .show(
+                                      misskey.NotesShowRequest(noteId: noteId));
+                              ref
+                                  .read(notesProvider(account))
+                                  .registerNote(note);
+                              notes[noteId] = note;
+                            } catch (e, s) {
+                              print(s);
+                            }
+                          }
+                        }
+                        return notes;
+                      })(),
+                      builder: buildContent,
+                    )))));
   }
 }
 
@@ -163,30 +235,11 @@ class PageContent extends ConsumerWidget {
       }
     }
     if (content is misskey.PageNote) {
-      return FutureBuilder(
-        future: (() async {
-          final account = AccountScope.of(context);
-          final note = await ref
-              .read(misskeyProvider(account))
-              .notes
-              .show(misskey.NotesShowRequest(noteId: content.note));
-          ref.read(notesProvider(account)).registerNote(note);
-          return note;
-        })(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.data != null) {
-            return MisskeyNote(note: snapshot.data!);
-          } else if (snapshot.hasError) {
-            return Text(S.of(context).thrownError);
-          } else {
-            return const Center(
-              child: SizedBox(
-                  width: 20, height: 20, child: CircularProgressIndicator()),
-            );
-          }
-        },
-      );
+      final notes = _NoteScope.of(context);
+      if (notes.containsKey(content.note) == false) {
+        return Text(S.of(context).thrownError);
+      }
+      return MisskeyNote(note: notes[content.note]!);
     }
     if (content is misskey.PageSection) {
       return Padding(
@@ -287,5 +340,28 @@ class PageLikeButtonState extends ConsumerState<PageLikeButton> {
         label: Text(likeCount.format()),
       );
     }
+  }
+}
+
+class _NoteScope extends InheritedWidget {
+  final HashMap<String, misskey.Note> notes;
+
+  const _NoteScope({
+    super.key,
+    required this.notes,
+    required super.child,
+  });
+
+  static HashMap<String, misskey.Note> of(BuildContext context) {
+    final notes = context.dependOnInheritedWidgetOfExactType<_NoteScope>();
+    if (notes == null) {
+      throw Exception("has not ancestor");
+    }
+    return notes.notes;
+  }
+
+  @override
+  bool updateShouldNotify(covariant _NoteScope oldWidget) {
+    return !mapEquals(notes, oldWidget.notes);
   }
 }
