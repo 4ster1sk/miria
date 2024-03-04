@@ -1,12 +1,16 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miria/extensions/origin_extension.dart';
+import 'package:miria/extensions/user_extension.dart';
 import 'package:miria/model/account.dart';
 import 'package:miria/providers.dart';
+import 'package:miria/router/app_router.dart';
 import 'package:miria/view/common/account_scope.dart';
 import 'package:miria/view/common/pushable_listview.dart';
 import 'package:miria/view/user_page/user_list_item.dart';
 import 'package:misskey_dart/misskey_dart.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserSelectDialog extends StatelessWidget {
   final Account account;
@@ -51,13 +55,123 @@ final usersSelectDialogQueryProvider = StateProvider.autoDispose((ref) => "");
 final usersSelectDialogOriginProvider =
     StateProvider.autoDispose((ref) => Origin.combined);
 
+class _AutocompleteOption extends Object {
+  UserLite? user;
+  String text;
+
+  _AutocompleteOption(this.text, this.user);
+}
+
 class UserSelectContentState extends ConsumerState<UserSelectContent> {
   final queryController = TextEditingController();
+  final focusNode = FocusNode();
 
   @override
   void dispose() {
     queryController.dispose();
     super.dispose();
+  }
+
+  Widget buildInputField() {
+    return LayoutBuilder(
+        builder: (context, constraints) => RawAutocomplete<_AutocompleteOption>(
+              textEditingController: queryController,
+              focusNode:
+                  (widget.focusNode != null) ? widget.focusNode : focusNode,
+              displayStringForOption: (m) => m.text,
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return const Iterable<_AutocompleteOption>.empty();
+                }
+                return [
+                  _AutocompleteOption(textEditingValue.text, null),
+                  ...ref
+                          .read(userCacheRepositoryProvider)
+                          .userCache
+                          .where((element) =>
+                              element.acct == AccountScope.of(context).acct)
+                          .firstOrNull
+                          ?.users
+                          .entries
+                          .where((e) {
+                            final v = textEditingValue.text.toLowerCase();
+                            return e.value.acct.toLowerCase().contains(v) ||
+                                (e.value.name?.toLowerCase().contains(v) ??
+                                    false);
+                          })
+                          .map(
+                              (e) => _AutocompleteOption(e.value.acct, e.value))
+                          .toList() ??
+                      []
+                ];
+              },
+              onSelected: (_AutocompleteOption value) {
+                if (value.user != null) {
+                  widget.onSelected(value.user!);
+                } else {
+                  ref.read(usersSelectDialogQueryProvider.notifier).state =
+                      value.text;
+                }
+              },
+              fieldViewBuilder: (
+                context,
+                textEditingController,
+                focusNode,
+                onFieldSubmitted,
+              ) {
+                return TextField(
+                  controller: textEditingController,
+                  focusNode: focusNode,
+                  autofocus: true,
+                  onSubmitted: (String value) {
+                    onFieldSubmitted();
+                  },
+                );
+              },
+              optionsViewBuilder: (
+                _,
+                onSelected,
+                options,
+              ) {
+                return AccountScope(
+                  account: AccountScope.of(context),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0,
+                        child: SizedBox(
+                          width: constraints.biggest.width,
+                          height: 46 + (79 * 3),
+                          child: ListView.builder(
+                            itemCount: options.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final _AutocompleteOption option =
+                                  options.elementAt(index);
+                              final bool highlight =
+                                  AutocompleteHighlightedOption.of(context) ==
+                                      index;
+                              return ListTile(
+                                tileColor: highlight
+                                    ? Theme.of(context).focusColor
+                                    : null,
+                                contentPadding: (index == 0)
+                                    ? null
+                                    : const EdgeInsets.all(0),
+                                title: (index == 0)
+                                    ? Text(
+                                        S.of(context).searchUser(option.text))
+                                    : UserListItem(
+                                        user: option.user!,
+                                        onTap: () => onSelected(option)),
+                                onTap: () => onSelected(option),
+                              );
+                            },
+                          ),
+                        ),
+                      )),
+                );
+              },
+            ));
   }
 
   @override
@@ -68,15 +182,7 @@ class UserSelectContentState extends ConsumerState<UserSelectContent> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        TextField(
-          controller: queryController,
-          focusNode: widget.focusNode,
-          autofocus: true,
-          decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-          onSubmitted: (value) {
-            ref.read(usersSelectDialogQueryProvider.notifier).state = value;
-          },
-        ),
+        buildInputField(),
         const Padding(padding: EdgeInsets.only(bottom: 10)),
         LayoutBuilder(
           builder: (context, constraints) {

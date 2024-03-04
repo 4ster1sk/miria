@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miria/model/account.dart';
 import 'package:miria/providers.dart';
+import 'package:miria/repository/user_cache_repository.dart';
 import 'package:miria/view/common/account_scope.dart';
 import 'package:miria/view/common/error_detail.dart';
 import 'package:miria/view/common/misskey_notes/mfm_text.dart';
@@ -100,8 +101,7 @@ class UserPageState extends ConsumerState<UserPage> {
                         child: UserDetail(
                           response: userInfo.remoteResponse!,
                           account: Account.demoAccount(
-                              userInfo.response!.host!,
-                              userInfo.metaResponse!),
+                              userInfo.response!.host!, userInfo.metaResponse!),
                           controlAccount: widget.account,
                         ),
                       ),
@@ -217,6 +217,8 @@ class UserDetailTabState extends ConsumerState<UserDetailTab> {
           remoteResponse: null,
           metaResponse: null,
         );
+        if (response != null)
+          ref.read(userCacheRepositoryProvider).insert([response!], account);
 
         final remoteHost = response?.host;
         if (remoteHost != null) {
