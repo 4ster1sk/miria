@@ -33,6 +33,7 @@ class SplashPageState extends ConsumerState<SplashPage> {
       await ref.read(emojiRepositoryProvider(account)).loadFromLocalCache();
       ref.read(mainStreamRepositoryProvider(account)).connect();
     }
+    await ref.read(userCacheRepositoryProvider).load();
 
     if (_isFirst) {
       if (Platform.isAndroid || Platform.isIOS) {

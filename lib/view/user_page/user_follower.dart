@@ -32,7 +32,16 @@ class UserFollowerPage extends ConsumerWidget {
                 .read(misskeyProvider(account))
                 .users
                 .followers(UsersFollowersRequest(userId: userId));
-            return response.toList();
+            final l = response.toList();
+
+            ref.read(userCacheRepositoryProvider).insert(
+                l.where((e) {
+                  final v = (e.follower! as UserDetailedNotMeWithRelations);
+                  return (v.isFollowed || v.isFollowing);
+                }).map((e) => e.follower!),
+                account);
+
+            return l;
           },
           nextFuture: (lastItem, _) async {
             final response = await ref
@@ -40,7 +49,16 @@ class UserFollowerPage extends ConsumerWidget {
                 .users
                 .followers(UsersFollowersRequest(
                     userId: userId, untilId: lastItem.id));
-            return response.toList();
+            final l = response.toList();
+
+            ref.read(userCacheRepositoryProvider).insert(
+                l.where((e) {
+                  final v = (e.follower! as UserDetailedNotMeWithRelations);
+                  return (v.isFollowed || v.isFollowing);
+                }).map((e) => e.follower!),
+                account);
+
+            return l;
           },
           itemBuilder: (context, item) => UserListItem(
             user: item.follower!,

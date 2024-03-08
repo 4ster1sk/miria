@@ -23,6 +23,7 @@ import 'package:miria/repository/role_timeline_repository.dart';
 import 'package:miria/repository/note_repository.dart';
 import 'package:miria/repository/tab_settings_repository.dart';
 import 'package:miria/repository/time_line_repository.dart';
+import 'package:miria/repository/user_cache_repository.dart';
 import 'package:miria/repository/user_list_time_line_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:miria/state_notifier/antenna_page/antennas_notifier.dart';
@@ -253,6 +254,9 @@ final photoEditProvider =
 
 final importExportRepository =
     ChangeNotifierProvider((ref) => ImportExportRepository(ref.read));
+
+final userCacheRepositoryProvider =
+    ChangeNotifierProvider((ref) => UserCacheRepository());
 
 // TODO: 下書きの機能かんがえるときにfamilyの引数みなおす
 final noteCreateProvider = StateNotifierProvider.family
