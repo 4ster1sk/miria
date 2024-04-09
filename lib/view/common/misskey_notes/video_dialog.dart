@@ -1,14 +1,13 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:volume_controller/volume_controller.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
-import 'package:media_kit_video/media_kit_video_controls/src/controls/extensions/duration.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:video_player/video_player.dart';
+import 'package:miria/extensions/duration.dart';
 
 class VideoDialog extends StatefulWidget {
   const VideoDialog({super.key, required this.url, required this.fileType});
@@ -21,9 +20,8 @@ class VideoDialog extends StatefulWidget {
 }
 
 class _VideoDialogState extends State<VideoDialog> {
-  late final videoKey = GlobalKey<VideoState>();
-  late final player = Player();
-  late final controller = VideoController(player);
+  //late final videoKey = GlobalKey<VideoState>();
+  late final VideoPlayerController controller;
   late final bool isAudioFile;
 
   double aspectRatio = 1;
@@ -37,85 +35,29 @@ class _VideoDialogState extends State<VideoDialog> {
   @override
   void initState() {
     super.initState();
-    player.open(Media(widget.url));
-    controller.rect.addListener(() {
-      final rect = controller.rect.value;
-      if (rect == null || rect.width == 0 || rect.height == 0) {
-        return;
-      }
-      setState(() {
-        aspectRatio = rect.width / rect.height;
-      });
-    });
-    isAudioFile = widget.fileType.startsWith(RegExp("audio"));
+    isAudioFile = widget.fileType.startsWith("audio");
     if (isAudioFile) {
       isVisibleControlBar = true;
       isEnabledButton = true;
     }
-    ServicesBinding.instance.keyboard.addHandler(_onKey);
+
+    controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        controller.play();
+        setState(() {
+          aspectRatio = controller.value.aspectRatio;
+        });
+      });
   }
 
   @override
   void dispose() {
-    player.dispose();
-    ServicesBinding.instance.keyboard.removeHandler(_onKey);
-    VolumeController().removeListener();
+    controller.dispose();
     super.dispose();
-  }
-
-  bool _onKey(KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
-      if (!isFullScreen) {
-        Navigator.of(context).pop();
-        return true;
-      }
-    }
-    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeData = MaterialVideoControlsThemeData(
-        seekBarPositionColor: Theme.of(context).primaryColor,
-        seekBarThumbColor: Theme.of(context).primaryColor,
-        backdropColor: Colors.transparent,
-        volumeGesture: false,
-        brightnessGesture: false,
-        displaySeekBar: false,
-        automaticallyImplySkipNextButton: false,
-        automaticallyImplySkipPreviousButton: false,
-        primaryButtonBar: [],
-        bottomButtonBar: []);
-
-    final themeDataFull = MaterialVideoControlsThemeData(
-        seekBarPositionColor: Theme.of(context).primaryColor,
-        seekBarThumbColor: Theme.of(context).primaryColor,
-        volumeGesture: false,
-        brightnessGesture: false,
-        automaticallyImplySkipNextButton: false,
-        automaticallyImplySkipPreviousButton: false,
-        bottomButtonBarMargin:
-            const EdgeInsets.only(left: 16.0, right: 8.0, bottom: 16.0),
-        seekBarMargin: const EdgeInsets.only(bottom: 16.0));
-
-    final themeDataDesktop = MaterialDesktopVideoControlsThemeData(
-        seekBarPositionColor: Theme.of(context).primaryColor,
-        seekBarThumbColor: Theme.of(context).primaryColor,
-        modifyVolumeOnScroll: false,
-        displaySeekBar: false,
-        automaticallyImplySkipNextButton: false,
-        automaticallyImplySkipPreviousButton: false,
-        primaryButtonBar: [],
-        bottomButtonBar: []);
-
-    final themeDataDesktopFull = MaterialDesktopVideoControlsThemeData(
-        seekBarPositionColor: Theme.of(context).primaryColor,
-        seekBarThumbColor: Theme.of(context).primaryColor,
-        modifyVolumeOnScroll: false,
-        automaticallyImplySkipNextButton: false,
-        automaticallyImplySkipPreviousButton: false);
-
     return AlertDialog(
       backgroundColor: Colors.transparent,
       titlePadding: EdgeInsets.zero,
@@ -171,31 +113,14 @@ class _VideoDialogState extends State<VideoDialog> {
                       Align(
                           child: AspectRatio(
                               aspectRatio: aspectRatio,
-                              child: MaterialVideoControlsTheme(
-                                normal: themeData,
-                                fullscreen: themeDataFull,
-                                child: MaterialDesktopVideoControlsTheme(
-                                    normal: themeDataDesktop,
-                                    fullscreen: themeDataDesktopFull,
-                                    child: Video(
-                                      key: videoKey,
-                                      controller: controller,
-                                      controls: AdaptiveVideoControls,
-                                      fill: Colors.transparent,
-                                      onEnterFullscreen: () async {
-                                        isFullScreen = true;
-                                        await defaultEnterNativeFullscreen();
-                                        videoKey.currentState
-                                            ?.update(fill: Colors.black);
-                                      },
-                                      onExitFullscreen: () async {
-                                        await defaultExitNativeFullscreen();
-                                        isFullScreen = false;
-                                        videoKey.currentState
-                                            ?.update(fill: Colors.transparent);
-                                      },
-                                    )),
-                              ))),
+                              child: VideoPlayer(controller))),
+                      (controller.value.isBuffering)
+                          ? const Center(
+                              child: SizedBox(
+                                  height: 48.0,
+                                  width: 48.0,
+                                  child: CircularProgressIndicator()))
+                          : Container(),
                       AnimatedOpacity(
                         curve: Curves.easeInOut,
                         opacity: isVisibleControlBar ? 1.0 : 0.0,
@@ -249,8 +174,8 @@ class _VideoDialogState extends State<VideoDialog> {
                                                 onTap: () async {
                                                   Navigator.of(innerContext)
                                                       .pop();
-                                                  videoKey.currentState
-                                                      ?.enterFullscreen();
+                                                  /*(videoKey.currentState
+                                                      ?.enterFullscreen();*/
                                                 },
                                               )
                                           ],
@@ -306,7 +231,7 @@ class _VideoDialogState extends State<VideoDialog> {
 }
 
 class _VideoControls extends StatefulWidget {
-  final VideoController controller;
+  final VideoPlayerController controller;
   final double iconSize = 30.0;
   final VoidCallback? onMenuPressed;
   final bool isAudioFile;
@@ -322,10 +247,15 @@ class _VideoControls extends StatefulWidget {
 
 class _VideoControlState extends State<_VideoControls> {
   final List<StreamSubscription> subscriptions = [];
+  late final VoidCallback _listener;
 
-  late Duration position = widget.controller.player.state.position;
-  late Duration bufferPosition = widget.controller.player.state.buffer;
-  late Duration duration = widget.controller.player.state.duration;
+  Duration position = const Duration(seconds: 0);
+  _VideoControlState() {
+    _listener = () {
+      // 検知したタイミングで再描画する
+      setState(() {});
+    };
+  }
 
   bool isSeeking = false;
   bool isMute = false;
@@ -333,39 +263,31 @@ class _VideoControlState extends State<_VideoControls> {
   @override
   void initState() {
     super.initState();
-    if (subscriptions.isEmpty) {
-      subscriptions.addAll([
-        widget.controller.player.stream.position.listen((event) {
-          setState(() {
-            if (!isSeeking) {
-              position = event;
-            }
-          });
-        }),
-        widget.controller.player.stream.buffer.listen((event) {
-          setState(() {
-            bufferPosition = event;
-          });
-        }),
-        widget.controller.player.stream.duration.listen((event) {
-          setState(() {
-            duration = event;
-          });
-        })
-      ]);
-    }
+    widget.controller.addListener(_listener);
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_listener);
     super.dispose();
-    for (final subscription in subscriptions) {
-      subscription.cancel();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!isSeeking) {
+      position = widget.controller.value.position;
+    }
+
+    final duration = widget.controller.value.duration;
+
+    int maxBuffering = 0;
+    for (final DurationRange range in widget.controller.value.buffered) {
+      final int end = range.end.inMilliseconds;
+      if (end > maxBuffering) {
+        maxBuffering = end;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
       width: MediaQuery.of(context).size.width,
@@ -389,17 +311,13 @@ class _VideoControlState extends State<_VideoControls> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: IconButton(
-                          iconSize: widget.iconSize,
-                          onPressed: () =>
-                              widget.controller.player.playOrPause(),
-                          icon: StreamBuilder(
-                              stream: widget.controller.player.stream.playing,
-                              builder: (context, playing) => Icon(
-                                    playing.data == true
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
-                                  )),
-                        ),
+                            iconSize: widget.iconSize,
+                            onPressed: () => widget.controller.value.isPlaying
+                                ? widget.controller.pause()
+                                : widget.controller.play(),
+                            icon: Icon(widget.controller.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow)),
                       ),
                       Text(position.label(reference: duration),
                           textAlign: TextAlign.center),
@@ -413,19 +331,12 @@ class _VideoControlState extends State<_VideoControls> {
                   ),
                   IconButton(
                       iconSize: widget.iconSize,
-                      onPressed: () async {
-                        await widget.controller.player
-                            .setVolume(isMute ? 100 : 0);
+                      onPressed: () {
+                        widget.controller.setVolume(isMute ? 100 : 0);
                         isMute = !isMute;
                       },
-                      icon: StreamBuilder(
-                        stream: widget.controller.player.stream.volume,
-                        builder: (context, playing) => Icon(
-                          playing.data == 0
-                              ? Icons.volume_off
-                              : Icons.volume_up,
-                        ),
-                      )),
+                      icon:
+                          Icon((isMute) ? Icons.volume_off : Icons.volume_up)),
                   IconButton(
                     onPressed: widget.onMenuPressed,
                     icon: const Icon(Icons.more_horiz),
@@ -448,8 +359,7 @@ class _VideoControlState extends State<_VideoControls> {
                         thumbColor: Theme.of(context).primaryColor,
                         activeColor: Theme.of(context).primaryColor,
                         value: position.inMilliseconds.toDouble(),
-                        secondaryTrackValue:
-                            bufferPosition.inMilliseconds.toDouble(),
+                        secondaryTrackValue: maxBuffering.toDouble(),
                         min: 0,
                         max: duration.inMilliseconds.toDouble(),
                         onChangeStart: (double value) {
@@ -461,7 +371,7 @@ class _VideoControlState extends State<_VideoControls> {
                           });
                         },
                         onChangeEnd: (double value) {
-                          widget.controller.player.seek(position);
+                          widget.controller.seekTo(position);
                           isSeeking = false;
                         },
                       )))

@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:miria/model/desktop_settings.dart';
 import 'package:miria/providers.dart';
 import 'package:miria/router/app_router.dart';
@@ -18,7 +17,6 @@ import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     windowManager.ensureInitialized();
   }
@@ -128,7 +126,11 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
       title: 'Miria',
       debugShowCheckedModeBanner: false,
       locale: Locale(language.countryCode, language.languageCode),
-      supportedLocales: const [Locale("ja", "JP"), Locale("ja", "OJ"), Locale("zh", "CN")],
+      supportedLocales: const [
+        Locale("ja", "JP"),
+        Locale("ja", "OJ"),
+        Locale("zh", "CN")
+      ],
       scrollBehavior: AppScrollBehavior(),
       localizationsDelegates: const [
         S.delegate,
