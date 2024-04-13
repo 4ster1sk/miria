@@ -24,6 +24,9 @@ mixin _$GeneralSettings {
   String get darkColorThemeId => throw _privateConstructorUsedError;
   ThemeColorSystem get themeColorSystem => throw _privateConstructorUsedError;
 
+  /// 使用するビデオプレーヤーのライブラリを指定
+  VideoPlayerLib get videoPlayerLib => throw _privateConstructorUsedError;
+
   /// NSFW設定を継承する
   NSFWInherit get nsfwInherit => throw _privateConstructorUsedError;
 
@@ -85,6 +88,7 @@ abstract class $GeneralSettingsCopyWith<$Res> {
       {String lightColorThemeId,
       String darkColorThemeId,
       ThemeColorSystem themeColorSystem,
+      VideoPlayerLib videoPlayerLib,
       NSFWInherit nsfwInherit,
       bool enableDirectReaction,
       AutomaticPush automaticPush,
@@ -118,6 +122,7 @@ class _$GeneralSettingsCopyWithImpl<$Res, $Val extends GeneralSettings>
     Object? lightColorThemeId = null,
     Object? darkColorThemeId = null,
     Object? themeColorSystem = null,
+    Object? videoPlayerLib = null,
     Object? nsfwInherit = null,
     Object? enableDirectReaction = null,
     Object? automaticPush = null,
@@ -147,6 +152,10 @@ class _$GeneralSettingsCopyWithImpl<$Res, $Val extends GeneralSettings>
           ? _value.themeColorSystem
           : themeColorSystem // ignore: cast_nullable_to_non_nullable
               as ThemeColorSystem,
+      videoPlayerLib: null == videoPlayerLib
+          ? _value.videoPlayerLib
+          : videoPlayerLib // ignore: cast_nullable_to_non_nullable
+              as VideoPlayerLib,
       nsfwInherit: null == nsfwInherit
           ? _value.nsfwInherit
           : nsfwInherit // ignore: cast_nullable_to_non_nullable
@@ -223,6 +232,7 @@ abstract class _$$GeneralSettingsImplCopyWith<$Res>
       {String lightColorThemeId,
       String darkColorThemeId,
       ThemeColorSystem themeColorSystem,
+      VideoPlayerLib videoPlayerLib,
       NSFWInherit nsfwInherit,
       bool enableDirectReaction,
       AutomaticPush automaticPush,
@@ -254,6 +264,7 @@ class __$$GeneralSettingsImplCopyWithImpl<$Res>
     Object? lightColorThemeId = null,
     Object? darkColorThemeId = null,
     Object? themeColorSystem = null,
+    Object? videoPlayerLib = null,
     Object? nsfwInherit = null,
     Object? enableDirectReaction = null,
     Object? automaticPush = null,
@@ -283,6 +294,10 @@ class __$$GeneralSettingsImplCopyWithImpl<$Res>
           ? _value.themeColorSystem
           : themeColorSystem // ignore: cast_nullable_to_non_nullable
               as ThemeColorSystem,
+      videoPlayerLib: null == videoPlayerLib
+          ? _value.videoPlayerLib
+          : videoPlayerLib // ignore: cast_nullable_to_non_nullable
+              as VideoPlayerLib,
       nsfwInherit: null == nsfwInherit
           ? _value.nsfwInherit
           : nsfwInherit // ignore: cast_nullable_to_non_nullable
@@ -354,6 +369,7 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
       {this.lightColorThemeId = "",
       this.darkColorThemeId = "",
       this.themeColorSystem = ThemeColorSystem.system,
+      this.videoPlayerLib = VideoPlayerLib.mediaKit,
       this.nsfwInherit = NSFWInherit.inherit,
       this.enableDirectReaction = false,
       this.automaticPush = AutomaticPush.none,
@@ -382,6 +398,11 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
   @override
   @JsonKey()
   final ThemeColorSystem themeColorSystem;
+
+  /// 使用するビデオプレーヤーのライブラリを指定
+  @override
+  @JsonKey()
+  final VideoPlayerLib videoPlayerLib;
 
   /// NSFW設定を継承する
   @override
@@ -460,7 +481,7 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
 
   @override
   String toString() {
-    return 'GeneralSettings(lightColorThemeId: $lightColorThemeId, darkColorThemeId: $darkColorThemeId, themeColorSystem: $themeColorSystem, nsfwInherit: $nsfwInherit, enableDirectReaction: $enableDirectReaction, automaticPush: $automaticPush, enableAnimatedMFM: $enableAnimatedMFM, enableLongTextElipsed: $enableLongTextElipsed, enableFavoritedRenoteElipsed: $enableFavoritedRenoteElipsed, tabPosition: $tabPosition, textScaleFactor: $textScaleFactor, emojiType: $emojiType, defaultFontName: $defaultFontName, serifFontName: $serifFontName, monospaceFontName: $monospaceFontName, cursiveFontName: $cursiveFontName, fantasyFontName: $fantasyFontName, languages: $languages)';
+    return 'GeneralSettings(lightColorThemeId: $lightColorThemeId, darkColorThemeId: $darkColorThemeId, themeColorSystem: $themeColorSystem, videoPlayerLib: $videoPlayerLib, nsfwInherit: $nsfwInherit, enableDirectReaction: $enableDirectReaction, automaticPush: $automaticPush, enableAnimatedMFM: $enableAnimatedMFM, enableLongTextElipsed: $enableLongTextElipsed, enableFavoritedRenoteElipsed: $enableFavoritedRenoteElipsed, tabPosition: $tabPosition, textScaleFactor: $textScaleFactor, emojiType: $emojiType, defaultFontName: $defaultFontName, serifFontName: $serifFontName, monospaceFontName: $monospaceFontName, cursiveFontName: $cursiveFontName, fantasyFontName: $fantasyFontName, languages: $languages)';
   }
 
   @override
@@ -474,6 +495,8 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
                 other.darkColorThemeId == darkColorThemeId) &&
             (identical(other.themeColorSystem, themeColorSystem) ||
                 other.themeColorSystem == themeColorSystem) &&
+            (identical(other.videoPlayerLib, videoPlayerLib) ||
+                other.videoPlayerLib == videoPlayerLib) &&
             (identical(other.nsfwInherit, nsfwInherit) ||
                 other.nsfwInherit == nsfwInherit) &&
             (identical(other.enableDirectReaction, enableDirectReaction) ||
@@ -510,26 +533,28 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      lightColorThemeId,
-      darkColorThemeId,
-      themeColorSystem,
-      nsfwInherit,
-      enableDirectReaction,
-      automaticPush,
-      enableAnimatedMFM,
-      enableLongTextElipsed,
-      enableFavoritedRenoteElipsed,
-      tabPosition,
-      textScaleFactor,
-      emojiType,
-      defaultFontName,
-      serifFontName,
-      monospaceFontName,
-      cursiveFontName,
-      fantasyFontName,
-      languages);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        lightColorThemeId,
+        darkColorThemeId,
+        themeColorSystem,
+        videoPlayerLib,
+        nsfwInherit,
+        enableDirectReaction,
+        automaticPush,
+        enableAnimatedMFM,
+        enableLongTextElipsed,
+        enableFavoritedRenoteElipsed,
+        tabPosition,
+        textScaleFactor,
+        emojiType,
+        defaultFontName,
+        serifFontName,
+        monospaceFontName,
+        cursiveFontName,
+        fantasyFontName,
+        languages
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -551,6 +576,7 @@ abstract class _GeneralSettings implements GeneralSettings {
       {final String lightColorThemeId,
       final String darkColorThemeId,
       final ThemeColorSystem themeColorSystem,
+      final VideoPlayerLib videoPlayerLib,
       final NSFWInherit nsfwInherit,
       final bool enableDirectReaction,
       final AutomaticPush automaticPush,
@@ -576,6 +602,10 @@ abstract class _GeneralSettings implements GeneralSettings {
   String get darkColorThemeId;
   @override
   ThemeColorSystem get themeColorSystem;
+  @override
+
+  /// 使用するビデオプレーヤーのライブラリを指定
+  VideoPlayerLib get videoPlayerLib;
   @override
 
   /// NSFW設定を継承する

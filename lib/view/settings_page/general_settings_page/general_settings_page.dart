@@ -23,6 +23,7 @@ class GeneralSettingsPageState extends ConsumerState<GeneralSettingsPage> {
   String lightModeTheme = "";
   String darkModeTheme = "";
   ThemeColorSystem colorSystem = ThemeColorSystem.system;
+  VideoPlayerLib videoPlayerLib = VideoPlayerLib.mediaKit;
   NSFWInherit nsfwInherit = NSFWInherit.inherit;
   AutomaticPush automaticPush = AutomaticPush.none;
   bool enableDirectReaction = false;
@@ -64,6 +65,7 @@ class GeneralSettingsPageState extends ConsumerState<GeneralSettingsPage> {
             builtInColorThemes.where((element) => element.isDarkTheme).first.id;
       }
       colorSystem = settings.themeColorSystem;
+      videoPlayerLib = settings.videoPlayerLib;
       nsfwInherit = settings.nsfwInherit;
       enableDirectReaction = settings.enableDirectReaction;
       automaticPush = settings.automaticPush;
@@ -88,6 +90,7 @@ class GeneralSettingsPageState extends ConsumerState<GeneralSettingsPage> {
               lightColorThemeId: lightModeTheme,
               darkColorThemeId: darkModeTheme,
               themeColorSystem: colorSystem,
+              videoPlayerLib: videoPlayerLib,
               nsfwInherit: nsfwInherit,
               enableDirectReaction: enableDirectReaction,
               automaticPush: automaticPush,
@@ -523,6 +526,36 @@ class GeneralSettingsPageState extends ConsumerState<GeneralSettingsPage> {
                           fantasyFontName = item?.actualName ?? "";
                           save();
                         }),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(S.of(context).useVideoPlayerLib),
+                      DropdownButton(
+                        items: [
+                          for (final type in VideoPlayerLib.values)
+                            DropdownMenuItem(
+                              value: type,
+                              child: Text(type.displayName(context)),
+                            ),
+                        ],
+                        value: videoPlayerLib,
+                        isExpanded: true,
+                        onChanged: (value) {
+                          setState(() {
+                            videoPlayerLib = value ?? VideoPlayerLib.mediaKit;
+                            save();
+                          });
+                        },
                       ),
                     ],
                   ),

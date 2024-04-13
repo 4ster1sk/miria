@@ -5,6 +5,18 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'general_settings.freezed.dart';
 part 'general_settings.g.dart';
 
+enum VideoPlayerLib {
+  mediaKit,
+  videoPlayer;
+
+  String displayName(BuildContext context) {
+    return switch (this) {
+      VideoPlayerLib.mediaKit => "MediaKit",
+      VideoPlayerLib.videoPlayer => "VideoPlayer",
+    };
+  }
+}
+
 enum ThemeColorSystem {
   forceLight,
   forceDark,
@@ -89,6 +101,9 @@ class GeneralSettings with _$GeneralSettings {
     @Default("") String lightColorThemeId,
     @Default("") String darkColorThemeId,
     @Default(ThemeColorSystem.system) ThemeColorSystem themeColorSystem,
+
+    /// 使用するビデオプレーヤーのライブラリを指定
+    @Default(VideoPlayerLib.mediaKit) VideoPlayerLib videoPlayerLib,
 
     /// NSFW設定を継承する
     @Default(NSFWInherit.inherit) NSFWInherit nsfwInherit,

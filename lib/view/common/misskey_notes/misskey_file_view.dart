@@ -7,6 +7,7 @@ import 'package:miria/view/common/image_dialog.dart';
 import 'package:miria/view/common/misskey_notes/in_note_button.dart';
 import 'package:miria/view/common/misskey_notes/network_image.dart';
 import 'package:miria/view/common/misskey_notes/video_dialog.dart';
+import 'package:miria/view/common/misskey_notes/video_dialog_mediakit.dart';
 import 'package:misskey_dart/misskey_dart.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -157,6 +158,8 @@ class MisskeyImageState extends ConsumerState<MisskeyImage> {
   Widget build(BuildContext context) {
     final nsfwSetting = ref.watch(generalSettingsRepositoryProvider
         .select((repository) => repository.settings.nsfwInherit));
+    final videoPlayerLib = ref.watch(generalSettingsRepositoryProvider
+        .select((repository) => repository.settings.videoPlayerLib));
     return Stack(
       children: [
         Align(
@@ -177,10 +180,15 @@ class MisskeyImageState extends ConsumerState<MisskeyImage> {
               } else if (widget.fileType.startsWith(RegExp("video|audio"))) {
                 showDialog(
                   context: context,
-                  builder: (context) => VideoDialog(
-                    url: widget.targetFiles[widget.position],
-                    fileType: widget.fileType,
-                  ),
+                  builder: (context) => (videoPlayerLib == VideoPlayerLib.videoPlayer)
+                  ? VideoDialog(
+                      url: widget.targetFiles[widget.position],
+                      fileType: widget.fileType,
+                    )
+                  : VideoDialogMediaKit(
+                      url: widget.targetFiles[widget.position],
+                      fileType: widget.fileType,
+                    ),
                 );
               } else {
                 launchUrl(Uri.parse(widget.targetFiles[widget.position]),

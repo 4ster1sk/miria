@@ -972,6 +972,8 @@
     "updatedAtAscendingOrder": "更新されていない順",
     "updatedAtDescendingOrder": "更新された順",
 
+    "useVideoPlayerLib": "使用するビデオプレーヤーライブラリ",
+
     "misskeyGames": "Misskey Games",
     "cookieCliker": "Cookie Cliker",
     "bubbleGame": "Bubble Game",

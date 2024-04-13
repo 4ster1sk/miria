@@ -14,6 +14,9 @@ _$GeneralSettingsImpl _$$GeneralSettingsImplFromJson(
       themeColorSystem: $enumDecodeNullable(
               _$ThemeColorSystemEnumMap, json['themeColorSystem']) ??
           ThemeColorSystem.system,
+      videoPlayerLib: $enumDecodeNullable(
+              _$VideoPlayerLibEnumMap, json['videoPlayerLib']) ??
+          VideoPlayerLib.videoPlayer,
       nsfwInherit:
           $enumDecodeNullable(_$NSFWInheritEnumMap, json['nsfwInherit']) ??
               NSFWInherit.inherit,
@@ -46,6 +49,7 @@ Map<String, dynamic> _$$GeneralSettingsImplToJson(
       'lightColorThemeId': instance.lightColorThemeId,
       'darkColorThemeId': instance.darkColorThemeId,
       'themeColorSystem': _$ThemeColorSystemEnumMap[instance.themeColorSystem]!,
+      'videoPlayerLib': _$VideoPlayerLibEnumMap[instance.videoPlayerLib]!,
       'nsfwInherit': _$NSFWInheritEnumMap[instance.nsfwInherit]!,
       'enableDirectReaction': instance.enableDirectReaction,
       'automaticPush': _$AutomaticPushEnumMap[instance.automaticPush]!,
@@ -67,6 +71,11 @@ const _$ThemeColorSystemEnumMap = {
   ThemeColorSystem.forceLight: 'forceLight',
   ThemeColorSystem.forceDark: 'forceDark',
   ThemeColorSystem.system: 'system',
+};
+
+const _$VideoPlayerLibEnumMap = {
+  VideoPlayerLib.mediaKit: 'mediaKit',
+  VideoPlayerLib.videoPlayer: 'videoPlayer',
 };
 
 const _$NSFWInheritEnumMap = {
@@ -94,4 +103,5 @@ const _$EmojiTypeEnumMap = {
 const _$LanguagesEnumMap = {
   Languages.jaJP: 'jaJP',
   Languages.jaOJ: 'jaOJ',
+  Languages.zhCN: 'zhCN',
 };
