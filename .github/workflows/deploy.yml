@@ -53,6 +53,9 @@ jobs:
 
         - name: Hoge
           run: |
+            ls -l /Users/
+            ls -l /Users/runner/
+            ls -l /Users/runner/work/flutter/
             ls -l /Users/runner/work/flutter/bin/cache/artifacts/
             ls -l /Users/runner/work/flutter/bin/cache/artifacts/engine
             ls -l /Users/runner/work/flutter/bin/cache/artifacts/engine/ios-release/
