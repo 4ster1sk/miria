@@ -54,6 +54,7 @@ jobs:
         - name: Hoge
           run: |
             ls -la /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64
+            find /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64 -type d -name "Flutter.xcframework"
           
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
