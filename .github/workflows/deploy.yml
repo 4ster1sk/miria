@@ -53,7 +53,7 @@ jobs:
 
         - name: Create symbolic link
           run: |
-            ln -s "${{ env.FLUTTER_ROOT }}" "$HOME/flutter/"
+            ln -s "${{ env.FLUTTER_ROOT }}" "$HOME/flutter"
             ls -la /Users/runner/
             ls -la /Users/runner/flutter/
             ls -la /Users/runner/flutter/bin
