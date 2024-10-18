@@ -55,6 +55,10 @@ jobs:
           run: |
             ls -la /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64
             find /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64 -type d -name "Flutter.xcframework"
+            
+        - name: Update path in project.pbxproj
+          run: |
+            sed -i '' 's|../../../flutter/bin/cache/|/Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64/bin/cache/|g' ios/Runner.xcodeproj/project.pbxproj
           
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
