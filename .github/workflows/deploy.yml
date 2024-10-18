@@ -56,6 +56,7 @@ jobs:
             ls -la /Users/
             ls -la /Users/runner/
             ls -la /Users/runner/work/
+            ls -la /Users/runner/.flutter/
             ls -la /Users/runner/work/flutter/
             ls -la /Users/runner/work/flutter/bin/cache/artifacts/
             ls -la /Users/runner/work/flutter/bin/cache/artifacts/engine
