@@ -53,15 +53,7 @@ jobs:
 
         - name: Hoge
           run: |
-            ls -la /Users/
-            ls -la /Users/runner/
-            ls -la /Users/runner/work/
-            ls -la /Users/runner/.flutter/
-            ls -la /Users/runner/work/flutter/
-            ls -la /Users/runner/work/flutter/bin/cache/artifacts/
-            ls -la /Users/runner/work/flutter/bin/cache/artifacts/engine
-            ls -la /Users/runner/work/flutter/bin/cache/artifacts/engine/ios-release/
-            ls -la /Users/runner/work/flutter/bin/cache/artifacts/engine/ios-release/extension_safe/
+            ls -la /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64
           
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
