@@ -54,9 +54,7 @@ jobs:
         - name: Create symbolic link
           run: |
             ln -s ${{ env.FLUTTER_ROOT }} flutter
-            ls -la /Users/runner/
-            ls -la /Users/runner/flutter/
-            ls -la /Users/runner/flutter/bin
+            ls -la /Users/runner/work/
             
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
