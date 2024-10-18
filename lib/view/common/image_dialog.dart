@@ -1,3 +1,4 @@
+import "dart:io";
 import "dart:math";
 
 import "package:flutter/foundation.dart";
@@ -10,6 +11,7 @@ import "package:miria/state_notifier/common/download_file_notifier.dart";
 import "package:miria/view/common/interactive_viewer.dart" as iv;
 import "package:miria/view/common/misskey_notes/network_image.dart";
 import "package:misskey_dart/misskey_dart.dart";
+import "package:url_launcher/url_launcher_string.dart";
 
 class ImageDialog extends HookConsumerWidget {
   final List<DriveFile> driveFiles;
@@ -44,6 +46,7 @@ class ImageDialog extends HookConsumerWidget {
       },
       [transformationController, scale],
     );
+    final isDesktop = !(Platform.isAndroid || Platform.isIOS);
 
     return AlertDialog(
       backgroundColor: Colors.transparent,
@@ -144,6 +147,34 @@ class ImageDialog extends HookConsumerWidget {
                           }
                           isDoubleTap.value = false;
                         },
+                        onSecondaryTap: () async {
+                          if (!isDesktop) return;
+                          await showModalBottomSheet(
+                            context: context,
+                            builder: (innerContext) {
+                              return ListView(
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.open_in_browser,
+                                    ),
+                                    title: Text(
+                                      S.of(context).openBrowsers,
+                                    ),
+                                    onTap: () async {
+                                      Navigator.of(innerContext).pop();
+                                      Navigator.of(context).pop();
+                                      await launchUrlString(
+                                        driveFiles[currentPage.value].url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         child: PageView(
                           controller: pageController,
                           onPageChanged: (int index) {
@@ -177,9 +208,12 @@ class ImageDialog extends HookConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(driveFiles.length, (index) {
                         return Container(
-                          width: MediaQuery.of(context).size.width / driveFiles.length, // 縦線の幅
+                          width: MediaQuery.of(context).size.width /
+                              driveFiles.length, // 縦線の幅
                           height: 3, // 縦線の高さ
-                          color: (currentPage.value == index) ? Theme.of(context).primaryColor : Colors.transparent, // 縦線の色
+                          color: (currentPage.value == index)
+                              ? Theme.of(context).primaryColor
+                              : Colors.transparent, // 縦線の色
                         );
                       })),
                 ),
