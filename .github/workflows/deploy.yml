@@ -53,8 +53,10 @@ jobs:
 
         - name: Create symbolic link
           run: |
-            ln -s /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64/ /Users/runner/flutter
-            ls -l /Users/runner/flutter
+            ln -s "${{ env.FLUTTER_ROOT }}" "${{ env.FLUTTER_HOME }}/flutter/"
+            ls -la /Users/runner/
+            ls -la /Users/runner/flutter/
+            ls -la /Users/runner/flutter/bin
             
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
