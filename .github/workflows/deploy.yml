@@ -51,15 +51,10 @@ jobs:
             git config --local user.name $GIT_USER_NAME
             git config --local user.email $GIT_USER_EMAIL
 
-        - name: Hoge
+        - name: Create symbolic link
           run: |
-            ls -la /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64
-            find /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64 -type d -name "Flutter.xcframework"
+            ln -s /Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64 /Users/runner/flutter
             
-        - name: Update path in project.pbxproj
-          run: |
-            sed -i '' 's|../../../flutter/bin/cache/|/Users/runner/hostedtoolcache/flutter/stable-3.24.3-arm64/bin/cache/|g' ios/Runner.xcodeproj/project.pbxproj
-          
         - name: Create archive file
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
 
