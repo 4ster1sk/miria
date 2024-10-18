@@ -30,6 +30,8 @@ class ImageDialog extends HookConsumerWidget {
     final maxScale = useState(8.0);
     final lastScale = useState(1.0);
 
+    final currentPage = useState(0);
+
     final isDoubleTap = useState(false);
     final lastDoubleTapDetails = useState<TapDownDetails?>(null);
 
@@ -144,6 +146,9 @@ class ImageDialog extends HookConsumerWidget {
                         },
                         child: PageView(
                           controller: pageController,
+                          onPageChanged: (int index) {
+                            currentPage.value = index;
+                          },
                           physics: (!isDoubleTap.value &&
                                   scale.value == 1.0 &&
                                   pointersCount.value <= 1)
@@ -164,6 +169,19 @@ class ImageDialog extends HookConsumerWidget {
                       ),
                     ),
                   ),
+                ),
+                if (driveFiles.length > 1) Positioned(
+                  left: 0,
+                  bottom: 0,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(driveFiles.length, (index) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width / driveFiles.length, // 縦線の幅
+                          height: 3, // 縦線の高さ
+                          color: (currentPage.value == index) ? Theme.of(context).primaryColor : Colors.transparent, // 縦線の色
+                        );
+                      })),
                 ),
                 Positioned(
                   left: 10,
