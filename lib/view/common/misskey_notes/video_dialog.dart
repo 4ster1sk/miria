@@ -88,6 +88,8 @@ class _VideoDialogState extends State<VideoDialog> {
       automaticallyImplySkipPreviousButton: false,
       primaryButtonBar: [],
       bottomButtonBar: [],
+      bottomButtonBarMargin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height,), // FIXME
     );
 
     final themeDataFull = MaterialVideoControlsThemeData(
