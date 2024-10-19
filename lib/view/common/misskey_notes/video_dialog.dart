@@ -83,10 +83,13 @@ class _VideoDialogState extends State<VideoDialog> {
       volumeGesture: false,
       brightnessGesture: false,
       displaySeekBar: false,
+      seekOnDoubleTap: false,
       automaticallyImplySkipNextButton: false,
       automaticallyImplySkipPreviousButton: false,
       primaryButtonBar: [],
       bottomButtonBar: [],
+      bottomButtonBarMargin: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height,), // FIXME
     );
 
     final themeDataFull = MaterialVideoControlsThemeData(
@@ -94,6 +97,8 @@ class _VideoDialogState extends State<VideoDialog> {
       seekBarThumbColor: Theme.of(context).primaryColor,
       volumeGesture: false,
       brightnessGesture: false,
+      displaySeekBar: true,
+      seekOnDoubleTap: true,
       automaticallyImplySkipNextButton: false,
       automaticallyImplySkipPreviousButton: false,
       bottomButtonBarMargin:
@@ -110,6 +115,7 @@ class _VideoDialogState extends State<VideoDialog> {
       automaticallyImplySkipPreviousButton: false,
       primaryButtonBar: [],
       bottomButtonBar: [],
+      playAndPauseOnTap: false,
     );
 
     final themeDataDesktopFull = MaterialDesktopVideoControlsThemeData(
@@ -118,6 +124,7 @@ class _VideoDialogState extends State<VideoDialog> {
       modifyVolumeOnScroll: false,
       automaticallyImplySkipNextButton: false,
       automaticallyImplySkipPreviousButton: false,
+      playAndPauseOnTap: false,
     );
 
     return AlertDialog(
@@ -469,9 +476,9 @@ class _VideoControlState extends State<_VideoControls> {
                 child: SliderTheme(
                   data: SliderThemeData(
                     overlayShape: SliderComponentShape.noOverlay,
-                    trackHeight: 3.0,
+                    trackHeight: 5.0,
                     thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 6.0,
+                      enabledThumbRadius: 10.0,
                     ),
                   ),
                   child: Slider(
