@@ -70,12 +70,13 @@ class VoteContentListItem extends HookConsumerWidget {
       () => ref.read(noteCreateNotifierProvider).voteContent[index],
     );
     final controller = useTextEditingController(text: initial);
+    final focusNode = FocusNode();
     ref.listen(
         noteCreateNotifierProvider.select(
           (value) =>
               value.voteContent.length <= index ? "" : value.voteContent[index],
         ), (_, next) {
-      controller.text = next;
+          if (!focusNode.hasFocus) controller.text = next;
     });
     useEffect(
       () {
@@ -99,6 +100,7 @@ class VoteContentListItem extends HookConsumerWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              focusNode: focusNode,
               decoration: InputDecoration(
                 hintText: S.of(context).choiceNumber(index + 1),
               ),
