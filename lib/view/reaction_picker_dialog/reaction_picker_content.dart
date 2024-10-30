@@ -3,6 +3,7 @@ import "dart:io";
 
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_gen/gen_l10n/app_localizations.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:miria/model/misskey_emoji_data.dart";
@@ -17,11 +18,13 @@ import "package:visibility_detector/visibility_detector.dart";
 class ReactionPickerContent extends ConsumerStatefulWidget {
   final FutureOr Function(MisskeyEmojiData emoji) onTap;
   final bool isAcceptSensitive;
+  final bool isSelect;
 
   const ReactionPickerContent({
     required this.onTap,
     required this.isAcceptSensitive,
     super.key,
+    this.isSelect = false,
   });
 
   @override
@@ -102,6 +105,7 @@ class EmojiButton extends ConsumerStatefulWidget {
   final FutureOr Function(MisskeyEmojiData emoji) onTap;
   final bool isForceVisible;
   final bool isAcceptSensitive;
+  final bool isSelect;
 
   const EmojiButton({
     required this.emoji,
@@ -109,6 +113,7 @@ class EmojiButton extends ConsumerStatefulWidget {
     required this.isAcceptSensitive,
     super.key,
     this.isForceVisible = false,
+    this.isSelect = false,
   });
 
   @override
@@ -138,7 +143,11 @@ class EmojiButtonState extends ConsumerState<EmojiButton> {
             : const BoxDecoration(),
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+            backgroundColor: WidgetStatePropertyAll(
+              (widget.isSelect)
+                  ? Theme.of(context).primaryColor.withOpacity(0.5)
+                  : Colors.transparent,
+            ),
             padding: const WidgetStatePropertyAll(EdgeInsets.all(5)),
             elevation: const WidgetStatePropertyAll(0),
             minimumSize: const WidgetStatePropertyAll(Size.zero),
@@ -200,27 +209,67 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
   TextEditingController textController = TextEditingController();
   FocusNode focusNode = FocusNode();
 
+  int index = -1;
+  bool isInit = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    emojis
-      ..clear()
-      ..addAll(emojiRepository.defaultEmojis().toList());
+    if (!isInit) {
+      emojis
+        ..clear()
+        ..addAll(emojiRepository.defaultEmojis().toList());
+      isInit = true;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        setState(() {
+          index = -1;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(children: [
-          Expanded(
-            child: TextField(
+        Row(
+          children: [
+            Expanded(
+                child: TextField(
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              controller: textController,
+              focusNode: focusNode,
               decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
               autofocus: ref
                   .read(generalSettingsRepositoryProvider)
                   .settings
                   .reactionSearchAutofocus,
+              inputFormatters: [
+                _EmojiSearchInputFormatter(
+                    onSpaceKey: (value) => {
+                          setState(() {
+                            index++;
+                            if (index > emojis.length) {
+                              index = 0;
+                            }
+                          }),
+                        },
+                    onEnterKey: (value) async {
+                          if (index >= 0 && emojis.length > index)
+                            {widget.onTap(emojis[index]);}
+                        },),
+                FilteringTextInputFormatter.deny(RegExp("\n| |　")),
+              ],
               onChanged: (value) {
+                index = -1;
                 Future(() async {
                   final result = await emojiRepository.searchEmojis(value);
                   if (!mounted) return;
@@ -230,31 +279,33 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
                   });
                 });
               },
-            ),
-          ),
-          if (Platform.isAndroid || Platform.isIOS)
-            IconButton(
-              onPressed: () async {
-                final f =
-                    !generalSettingsRepository.settings.reactionSearchAutofocus;
-                final settings = generalSettingsRepository.settings
-                    .copyWith(reactionSearchAutofocus: f);
-                await generalSettingsRepository.update(settings);
-                setState(() {
-                  if (f) {
-                    focusNode.requestFocus();
-                  } else {
-                    primaryFocus?.unfocus();
-                  }
-                });
-              },
-              icon: Icon(Icons.keyboard,
+            )),
+            if (Platform.isAndroid || Platform.isIOS)
+              IconButton(
+                onPressed: () async {
+                  final f = !generalSettingsRepository
+                      .settings.reactionSearchAutofocus;
+                  final settings = generalSettingsRepository.settings
+                      .copyWith(reactionSearchAutofocus: f);
+                  await generalSettingsRepository.update(settings);
+                  setState(() {
+                    if (f) {
+                      focusNode.requestFocus();
+                    } else {
+                      primaryFocus?.unfocus();
+                    }
+                  });
+                },
+                icon: Icon(
+                  Icons.keyboard,
                   color: (generalSettingsRepository
                           .settings.reactionSearchAutofocus)
                       ? Theme.of(context).primaryColor
-                      : null),
-            )
-        ]),
+                      : null,
+                ),
+              ),
+          ],
+        ),
         const Padding(padding: EdgeInsets.only(top: 10)),
         Align(
           alignment: Alignment.topLeft,
@@ -263,17 +314,39 @@ class EmojiSearchState extends ConsumerState<EmojiSearch> {
             runSpacing: 5,
             crossAxisAlignment: WrapCrossAlignment.start,
             children: [
-              for (final emoji in emojis)
+              for (int i = 0; emojis.length > i; i++)
                 EmojiButton(
-                  emoji: emoji,
+                  emoji: emojis[i],
                   onTap: widget.onTap,
                   isForceVisible: true,
                   isAcceptSensitive: widget.isAcceptSensitive,
+                  isSelect: index == i,
                 ),
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class _EmojiSearchInputFormatter extends TextInputFormatter {
+  final void Function(TextEditingValue value) onSpaceKey;
+  final void Function(TextEditingValue value) onEnterKey;
+
+  _EmojiSearchInputFormatter(
+      {required this.onSpaceKey, required this.onEnterKey});
+
+  @override
+  TextEditingValue formatEditUpdate(oldValue, newValue) {
+    if (newValue.text.endsWith("\n")) {
+      onEnterKey(newValue);
+      return newValue;
+    }
+    if (newValue.text.endsWith(" ") || newValue.text.endsWith("　")) {
+      onSpaceKey(newValue);
+      return newValue;
+    }
+    return newValue;
   }
 }
