@@ -146,6 +146,15 @@ class AntennaSettingsForm extends HookConsumerWidget {
     final settings = ref.watch(_antennaSettingsNotifierProvider);
     final list = ref.watch(_usersListListProvider);
     final controller = useTextEditingController();
+
+    useEffect(
+      () {
+        controller.text = settings.users.join("\n");
+        return null;
+      },
+      const [],
+    );
+
     ref.listen(
       _initialSettingsProvider.select((settings) => settings.users.join("\n")),
       (_, next) => controller.text = next,
