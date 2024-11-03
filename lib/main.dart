@@ -78,12 +78,16 @@ class Miria extends HookConsumerWidget with WidgetsBindingObserver {
       titleBarStyle: TitleBarStyle.normal,
     );
 
-    if (position != null) {
+    if (!Platform.isLinux && position != null) {
       await windowManager.setPosition(position);
     }
 
     await windowManager.waitUntilReadyToShow(opt, () async {
       await windowManager.show();
+      // Linuxの場合、ウィンドウが表示されてからでないと位置指定が効かないため
+      if (Platform.isLinux && position != null) {
+        await windowManager.setPosition(position);
+      }
       await windowManager.focus();
     });
   }
