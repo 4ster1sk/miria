@@ -9,8 +9,10 @@ import "package:miria/extensions/note_visibility_extension.dart";
 import "package:miria/model/account.dart";
 import "package:miria/providers.dart";
 import "package:miria/router/app_router.dart";
+import "package:miria/view/common/avatar_icon.dart";
 import "package:miria/view/common/dialog/dialog_state.dart";
 import "package:miria/view/common/misskey_notes/local_only_icon.dart";
+import "package:miria/view/common/misskey_notes/mfm_text.dart";
 import "package:misskey_dart/misskey_dart.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -151,6 +153,17 @@ class RenoteModalSheet extends HookConsumerWidget {
     }
     return ListView(
       children: [
+        ListTile(
+          leading: AvatarIcon(user: account.i),
+          title: SimpleMfmText(
+            account.i.name ?? account.i.username,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          subtitle: Text(
+            account.acct.toString(),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
         if (channel != null) ...[
           ListTile(
             onTap: () async =>
