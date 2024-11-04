@@ -2,7 +2,7 @@ name: miria
 description: Miria is Misskey Client for Mobile App.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.0.0+110
+version: 2.0.0+112
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -76,7 +76,7 @@ dependencies:
   hooks_riverpod: ^3.0.0-dev.3
   flutter_hooks: ^0.20.5
   punycode: ^1.0.0
-  screen_brightness: ^0.2.2
+  image: ^4.3.0
 
 dependency_overrides:
   image_editor:
@@ -95,6 +95,16 @@ dependency_overrides:
     git:
       url: https://github.com/knottx/image_gallery_saver.git
       ref: knottx-latest
+  media_kit:
+    git:
+      url: https://github.com/4ster1sk/media-kit.git
+      ref: 28292926cfd1e75611f7dcf39248124197d131cf
+      path: ./media_kit/
+  media_kit_video:
+    git:
+      url: https://github.com/4ster1sk/media-kit.git
+      ref: 28292926cfd1e75611f7dcf39248124197d131cf
+      path: ./media_kit_video/
 
 dev_dependencies:
   flutter_test:

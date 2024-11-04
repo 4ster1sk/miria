@@ -9,6 +9,7 @@ import "package:miria/model/account.dart";
 import "package:miria/model/antenna_settings.dart";
 import "package:miria/providers.dart";
 import "package:miria/router/app_router.dart";
+import "package:miria/view/common/account_scope.dart";
 import "package:misskey_dart/misskey_dart.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -99,7 +100,8 @@ Future<List<UsersList>> _usersListList(_UsersListListRef ref) async =>
     [...await ref.read(misskeyGetContextProvider).users.list.list()];
 
 @RoutePage<AntennaSettings>()
-class AntennaSettingsDialog extends StatelessWidget {
+class AntennaSettingsDialog extends StatelessWidget
+    implements AutoRouteWrapper {
   const AntennaSettingsDialog({
     required this.account,
     super.key,
@@ -129,6 +131,10 @@ class AntennaSettingsDialog extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Widget wrappedRoute(BuildContext context) =>
+      AccountContextScope.as(account: account, child: this);
 }
 
 class AntennaSettingsForm extends HookConsumerWidget {

@@ -660,6 +660,8 @@ class MisskeyNote extends HookConsumerWidget {
                           MisskeyFileView(
                             files: displayNote.files,
                             height: 200 * pow(0.5, recursive - 1).toDouble(),
+                            noteUrl:
+                                "https://${account.host}/notes/${displayNote.id}",
                           ),
                           if (displayNote.poll != null)
                             NoteVote(

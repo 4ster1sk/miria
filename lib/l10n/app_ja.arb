@@ -206,6 +206,7 @@
     "openBrowsers": "ブラウザで開く",
     "openBrowsersAsRemote": "ブラウザでリモート先を開く",
     "openInAnotherAccount": "別のアカウントで開く",
+    "openNoteInBrowsers": "ブラウザでノートを開く",
     "changeFullScreen": "フルスクリーンに切り替え",
     "shareNotes": "ノートを共有",
     "deleteFavorite": "お気に入り解除",
@@ -986,6 +987,9 @@
     "createdAtDescendingOrder": "新しい順",
     "updatedAtAscendingOrder": "更新されていない順",
     "updatedAtDescendingOrder": "更新された順",
+
+    "unsupportedFile": "対応してないファイルやわ",
+    "failedFileSave": "ファイルの保存に失敗したみたいや",
 
     "misskeyGames": "Misskey Games",
     "cookieCliker": "Cookie Cliker",

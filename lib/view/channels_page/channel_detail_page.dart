@@ -51,9 +51,11 @@ class ChannelDetailPage extends ConsumerWidget implements AutoRouteWrapper {
             ),
           ],
         ),
-        floatingActionButton: ChannelDetailFloatingActionButton(
-          channelId: channelId,
-        ),
+        floatingActionButton: ref.read(accountContextProvider).isSame
+            ? ChannelDetailFloatingActionButton(
+                channelId: channelId,
+              )
+            : null,
       ),
     );
   }

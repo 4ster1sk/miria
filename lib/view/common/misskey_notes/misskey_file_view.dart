@@ -5,22 +5,22 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:miria/model/general_settings.dart";
 import "package:miria/providers.dart";
-import "package:miria/view/common/image_dialog.dart";
 import "package:miria/view/common/misskey_notes/in_note_button.dart";
 import "package:miria/view/common/misskey_notes/network_image.dart";
-import "package:miria/view/common/misskey_notes/video_dialog.dart";
+import "package:miria/view/common/note_file_dialog/note_file_dialog.dart";
 import "package:misskey_dart/misskey_dart.dart";
-import "package:url_launcher/url_launcher.dart";
 
 class MisskeyFileView extends HookConsumerWidget {
   final List<DriveFile> files;
 
   final double height;
+  final String? noteUrl;
 
   const MisskeyFileView({
     required this.files,
     super.key,
     this.height = 200,
+    this.noteUrl,
   });
 
   @override
@@ -45,6 +45,7 @@ class MisskeyFileView extends HookConsumerWidget {
             fileType: targetFile.type,
             name: targetFile.name,
             position: 0,
+            noteUrl: noteUrl,
           ),
         ),
       );
@@ -74,6 +75,7 @@ class MisskeyFileView extends HookConsumerWidget {
                     fileType: targetFile.element.type,
                     name: targetFile.element.name,
                     position: targetFile.index,
+                    noteUrl: noteUrl,
                   ),
                 ),
             ],
@@ -96,6 +98,7 @@ class MisskeyImage extends HookConsumerWidget {
   final int position;
   final String fileType;
   final String name;
+  final String? noteUrl;
 
   const MisskeyImage({
     required this.isSensitive,
@@ -104,6 +107,7 @@ class MisskeyImage extends HookConsumerWidget {
     required this.position,
     required this.fileType,
     required this.name,
+    this.noteUrl,
     super.key,
   });
 
@@ -154,28 +158,14 @@ class MisskeyImage extends HookConsumerWidget {
                 nsfwAccepted.value = true;
                 return;
               } else {
-                if (fileType.startsWith("image")) {
-                  await showDialog(
-                    context: context,
-                    builder: (context) => ImageDialog(
-                      driveFiles: targetFiles,
-                      initialPage: position,
-                    ),
-                  );
-                } else if (fileType.startsWith(RegExp("video|audio"))) {
-                  await showDialog(
-                    context: context,
-                    builder: (context) => VideoDialog(
-                      url: targetFiles[position].url,
-                      fileType: fileType,
-                    ),
-                  );
-                } else {
-                  await launchUrl(
-                    Uri.parse(targetFiles[position].url),
-                    mode: LaunchMode.externalApplication,
-                  );
-                }
+                await showDialog(
+                  context: context,
+                  builder: (context) => NoteFileDialog(
+                    driveFiles: targetFiles,
+                    initialPage: position,
+                    noteUrl: noteUrl,
+                  ),
+                );
               }
             },
             child: Builder(
@@ -262,13 +252,29 @@ class MisskeyImage extends HookConsumerWidget {
                     ],
                   );
                 } else {
-                  return TextButton.icon(
-                    onPressed: () async => launchUrl(
-                      Uri.parse(targetFiles[position].url),
-                      mode: LaunchMode.externalApplication,
+                  return Container(
+                    decoration: const BoxDecoration(color: Colors.transparent),
+                    width: double.infinity,
+                    height: 200,
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.file_present,
+                          ),
+                          const Padding(padding: EdgeInsets.only(left: 5)),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                name,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    icon: const Icon(Icons.file_download_outlined),
-                    label: Text(name),
                   );
                 }
               },

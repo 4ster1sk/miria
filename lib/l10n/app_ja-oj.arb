@@ -104,8 +104,10 @@
     "pleaseSpecifyExpirationDate": "投票がいつまでか入れてくださいまし？",
     "pleaseSpecifyExpirationDuration": "投票期間を入れてくださいまし？",
     "cannotMentionToRemoteInLocalOnlyNote": "連合切られているのに他のサーバーの人がメンションに含まれているようですわ",
-    "cannotPublicReplyToPrivateNote": "リプライが{visibility}のようでして……パブリックにはできませんこと"
+    "cannotPublicReplyToPrivateNote": "リプライが{visibility}のようでして……パブリックにはできませんこと",
 
+    "unsupportedFile": "対応してないファイルのようですわ",
+    "failedFileSave": "ファイルの保存に失敗したようですわね…"
 
 
 

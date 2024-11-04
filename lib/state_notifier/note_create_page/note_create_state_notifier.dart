@@ -341,204 +341,207 @@ class NoteCreateNotifier extends _$NoteCreateNotifier {
       );
       return;
     }
+    await ref.read(dialogStateNotifierProvider.notifier).guard(() async {
+      try {
+        state = state.copyWith(isNoteSending: NoteSendStatus.sending);
 
-    try {
-      state = state.copyWith(isNoteSending: NoteSendStatus.sending);
+        final fileIds = <String>[];
 
-      final fileIds = <String>[];
+        for (final file in state.files) {
+          DriveFile? response;
 
-      for (final file in state.files) {
-        DriveFile? response;
-
-        switch (file) {
-          case ImageFile():
-            final fileName = file.fileName.toLowerCase();
-            var imageData = file.data;
-            try {
-              if (fileName.endsWith("jpg") ||
-                  fileName.endsWith("jpeg") ||
-                  fileName.endsWith("tiff") ||
-                  fileName.endsWith("tif")) {
-                imageData =
-                    await FlutterImageCompress.compressWithList(file.data);
+          switch (file) {
+            case ImageFile():
+              final fileName = file.fileName.toLowerCase();
+              var imageData = file.data;
+              try {
+                if (fileName.endsWith("jpg") ||
+                    fileName.endsWith("jpeg") ||
+                    fileName.endsWith("tiff") ||
+                    fileName.endsWith("tif")) {
+                  imageData =
+                      await FlutterImageCompress.compressWithList(file.data);
+                }
+              } catch (e) {
+                logger.shout("failed to compress file");
               }
-            } catch (e) {
-              logger.shout("failed to compress file");
-            }
 
-            response = await _misskey.drive.files.createAsBinary(
-              DriveFilesCreateRequest(
-                force: true,
-                name: file.fileName,
-                isSensitive: file.isNsfw,
-                comment: file.caption,
-              ),
-              imageData,
+              response = await _misskey.drive.files.createAsBinary(
+                DriveFilesCreateRequest(
+                  force: true,
+                  name: file.fileName,
+                  isSensitive: file.isNsfw,
+                  comment: file.caption,
+                ),
+                imageData,
+              );
+              fileIds.add(response.id);
+
+            case UnknownFile():
+              response = await _misskey.drive.files.createAsBinary(
+                DriveFilesCreateRequest(
+                  force: true,
+                  name: file.fileName,
+                  isSensitive: file.isNsfw,
+                  comment: file.caption,
+                ),
+                file.data,
+              );
+              fileIds.add(response.id);
+
+            case UnknownAlreadyPostedFile():
+              if (file.isEdited) {
+                await _misskey.drive.files.update(
+                  DriveFilesUpdateRequest(
+                    fileId: file.id,
+                    name: file.fileName,
+                    isSensitive: file.isNsfw,
+                    comment: file.caption,
+                  ),
+                );
+              }
+              fileIds.add(file.id);
+            case ImageFileAlreadyPostedFile():
+              if (file.isEdited) {
+                response = await _misskey.drive.files.update(
+                  DriveFilesUpdateRequest(
+                    fileId: file.id,
+                    name: file.fileName,
+                    isSensitive: file.isNsfw,
+                    comment: file.caption,
+                  ),
+                );
+              }
+
+              fileIds.add(file.id);
+          }
+
+          if (response?.isSensitive == true &&
+              !file.isNsfw &&
+              !ref.read(accountContextProvider).postAccount.i.alwaysMarkNsfw) {
+            final result = await _dialogNotifier.showDialog(
+              message: (context) => S.of(context).unexpectedSensitive,
+              actions: (context) =>
+                  [S.of(context).staySensitive, S.of(context).unsetSensitive],
             );
-            fileIds.add(response.id);
-
-          case UnknownFile():
-            response = await _misskey.drive.files.createAsBinary(
-              DriveFilesCreateRequest(
-                force: true,
-                name: file.fileName,
-                isSensitive: file.isNsfw,
-                comment: file.caption,
-              ),
-              file.data,
-            );
-            fileIds.add(response.id);
-
-          case UnknownAlreadyPostedFile():
-            if (file.isEdited) {
+            if (result == 1) {
               await _misskey.drive.files.update(
                 DriveFilesUpdateRequest(
-                  fileId: file.id,
-                  name: file.fileName,
-                  isSensitive: file.isNsfw,
-                  comment: file.caption,
+                  fileId: fileIds.last,
+                  isSensitive: false,
                 ),
               );
             }
-            fileIds.add(file.id);
-          case ImageFileAlreadyPostedFile():
-            if (file.isEdited) {
-              response = await _misskey.drive.files.update(
-                DriveFilesUpdateRequest(
-                  fileId: file.id,
-                  name: file.fileName,
-                  isSensitive: file.isNsfw,
-                  comment: file.caption,
-                ),
-              );
-            }
-
-            fileIds.add(file.id);
+          }
         }
 
-        if (response?.isSensitive == true &&
-            !file.isNsfw &&
-            !ref.read(accountContextProvider).postAccount.i.alwaysMarkNsfw) {
-          final result = await _dialogNotifier.showDialog(
-            message: (context) => S.of(context).unexpectedSensitive,
-            actions: (context) =>
-                [S.of(context).staySensitive, S.of(context).unsetSensitive],
+        final nodes = const MfmParser().parse(state.text);
+        final userList = <MfmMention>[];
+
+        void findMfmMentions(List<MfmNode> nodes) {
+          for (final node in nodes) {
+            if (node is MfmMention) {
+              userList.add(node);
+            }
+            findMfmMentions(node.children ?? []);
+          }
+        }
+
+        findMfmMentions(nodes);
+
+        // 連合オフなのに他のサーバーの人がメンションに含まれている
+        if (state.localOnly &&
+            userList.any(
+              (element) =>
+                  element.host != null && element.host != _misskey.host,
+            )) {
+          await _dialogNotifier.showSimpleDialog(
+            message: (context) =>
+                S.of(context).cannotMentionToRemoteInLocalOnlyNote,
           );
-          if (result == 1) {
-            await _misskey.drive.files.update(
-              DriveFilesUpdateRequest(
-                fileId: fileIds.last,
-                isSensitive: false,
+          return;
+        }
+
+        final mentionTargetUsers = [
+          for (final user in userList)
+            await _misskey.users.showByName(
+              UsersShowByUserNameRequest(
+                userName: user.username,
+                host: user.host,
               ),
-            );
-          }
-        }
-      }
-
-      final nodes = const MfmParser().parse(state.text);
-      final userList = <MfmMention>[];
-
-      void findMfmMentions(List<MfmNode> nodes) {
-        for (final node in nodes) {
-          if (node is MfmMention) {
-            userList.add(node);
-          }
-          findMfmMentions(node.children ?? []);
-        }
-      }
-
-      findMfmMentions(nodes);
-
-      // 連合オフなのに他のサーバーの人がメンションに含まれている
-      if (state.localOnly &&
-          userList.any(
-            (element) => element.host != null && element.host != _misskey.host,
-          )) {
-        await _dialogNotifier.showSimpleDialog(
-          message: (context) =>
-              S.of(context).cannotMentionToRemoteInLocalOnlyNote,
-        );
-        return;
-      }
-
-      final mentionTargetUsers = [
-        for (final user in userList)
-          await _misskey.users.showByName(
-            UsersShowByUserNameRequest(
-              userName: user.username,
-              host: user.host,
             ),
-          ),
-      ];
-      final visibleUserIds = state.replyTo.map((e) => e.id).toList()
-        ..addAll(mentionTargetUsers.map((e) => e.id));
+        ];
+        final visibleUserIds = state.replyTo.map((e) => e.id).toList()
+          ..addAll(mentionTargetUsers.map((e) => e.id));
 
-      final baseText =
-          "${state.replyTo.map((e) => "@${e.username}${e.host == null ? " " : "@${e.host} "}").join("")}${state.text}";
-      final postText = baseText.isNotEmpty ? baseText : null;
+        final baseText =
+            "${state.replyTo.map((e) => "@${e.username}${e.host == null ? " " : "@${e.host} "}").join("")}${state.text}";
+        final postText = baseText.isNotEmpty ? baseText : null;
 
-      final durationType = state.voteDurationType;
-      final voteDuration = Duration(
-        days: durationType == VoteExpireDurationType.day
-            ? state.voteDuration ?? 0
-            : 0,
-        hours: durationType == VoteExpireDurationType.hours
-            ? state.voteDuration ?? 0
-            : 0,
-        minutes: durationType == VoteExpireDurationType.minutes
-            ? state.voteDuration ?? 0
-            : 0,
-        seconds: durationType == VoteExpireDurationType.seconds
-            ? state.voteDuration ?? 0
-            : 0,
-      );
-
-      final poll = NotesCreatePollRequest(
-        choices: state.voteContent,
-        multiple: state.isVoteMultiple,
-        expiresAt:
-            state.voteExpireType == VoteExpireType.date ? state.voteDate : null,
-        expiredAfter: state.voteExpireType == VoteExpireType.duration
-            ? voteDuration
-            : null,
-      );
-
-      if (state.noteCreationMode == NoteCreationMode.update) {
-        await _misskey.notes.update(
-          NotesUpdateRequest(
-            noteId: state.noteId!,
-            text: postText ?? "",
-            cw: state.isCw ? state.cwText : null,
-          ),
+        final durationType = state.voteDurationType;
+        final voteDuration = Duration(
+          days: durationType == VoteExpireDurationType.day
+              ? state.voteDuration ?? 0
+              : 0,
+          hours: durationType == VoteExpireDurationType.hours
+              ? state.voteDuration ?? 0
+              : 0,
+          minutes: durationType == VoteExpireDurationType.minutes
+              ? state.voteDuration ?? 0
+              : 0,
+          seconds: durationType == VoteExpireDurationType.seconds
+              ? state.voteDuration ?? 0
+              : 0,
         );
-        _noteRepository.registerNote(
-          _noteRepository.notes[state.noteId!]!.copyWith(
-            text: postText ?? "",
-            cw: state.isCw ? state.cwText : null,
-          ),
+
+        final poll = NotesCreatePollRequest(
+          choices: state.voteContent,
+          multiple: state.isVoteMultiple,
+          expiresAt: state.voteExpireType == VoteExpireType.date
+              ? state.voteDate
+              : null,
+          expiredAfter: state.voteExpireType == VoteExpireType.duration
+              ? voteDuration
+              : null,
         );
-      } else {
-        await _misskey.notes.create(
-          NotesCreateRequest(
-            visibility: state.noteVisibility,
-            text: postText,
-            cw: state.isCw ? state.cwText : null,
-            localOnly: state.localOnly,
-            replyId: state.reply?.id,
-            renoteId: state.renote?.id,
-            channelId: state.channel?.id,
-            fileIds: fileIds.isEmpty ? null : fileIds,
-            visibleUserIds: visibleUserIds.toSet().toList(), //distinct list
-            reactionAcceptance: state.reactionAcceptance,
-            poll: state.isVote ? poll : null,
-          ),
-        );
+
+        if (state.noteCreationMode == NoteCreationMode.update) {
+          await _misskey.notes.update(
+            NotesUpdateRequest(
+              noteId: state.noteId!,
+              text: postText ?? "",
+              cw: state.isCw ? state.cwText : null,
+            ),
+          );
+          _noteRepository.registerNote(
+            _noteRepository.notes[state.noteId!]!.copyWith(
+              text: postText ?? "",
+              cw: state.isCw ? state.cwText : null,
+            ),
+          );
+        } else {
+          await _misskey.notes.create(
+            NotesCreateRequest(
+              visibility: state.noteVisibility,
+              text: postText,
+              cw: state.isCw ? state.cwText : null,
+              localOnly: state.localOnly,
+              replyId: state.reply?.id,
+              renoteId: state.renote?.id,
+              channelId: state.channel?.id,
+              fileIds: fileIds.isEmpty ? null : fileIds,
+              visibleUserIds: visibleUserIds.toSet().toList(), //distinct list
+              reactionAcceptance: state.reactionAcceptance,
+              poll: state.isVote ? poll : null,
+            ),
+          );
+        }
+        state = state.copyWith(isNoteSending: NoteSendStatus.finished);
+      } catch (e) {
+        state = state.copyWith(isNoteSending: NoteSendStatus.error);
+        rethrow;
       }
-      state = state.copyWith(isNoteSending: NoteSendStatus.finished);
-    } catch (e) {
-      state = state.copyWith(isNoteSending: NoteSendStatus.error);
-      rethrow;
-    }
+    });
   }
 
   /// メディアを選択する
@@ -589,6 +592,8 @@ class NoteCreateNotifier extends _$NoteCreateNotifier {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         allowMultiple: true,
+        allowCompression: false,
+        compressionQuality: 0,
       );
       if (result == null || result.files.isEmpty) return;
 

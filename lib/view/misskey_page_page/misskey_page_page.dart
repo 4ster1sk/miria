@@ -8,7 +8,7 @@ import "package:miria/extensions/list_mfm_node_extension.dart";
 import "package:miria/providers.dart";
 import "package:miria/view/common/account_scope.dart";
 import "package:miria/view/common/constants.dart";
-import "package:miria/view/common/image_dialog.dart";
+import "package:miria/view/common/note_file_dialog/note_file_dialog.dart";
 import "package:miria/view/common/misskey_notes/link_preview.dart";
 import "package:miria/view/common/misskey_notes/mfm_text.dart";
 import "package:miria/view/common/misskey_notes/misskey_note.dart";
@@ -174,7 +174,7 @@ class PageContent extends ConsumerWidget {
           onTap: () async => showDialog(
             context: context,
             builder: (context) =>
-                ImageDialog(driveFiles: [file], initialPage: 0),
+                NoteFileDialog(driveFiles: [file], initialPage: 0),
           ),
           child: NetworkImageView(
             url: thumbnailUrl ?? url,

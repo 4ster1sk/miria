@@ -7,7 +7,7 @@ part of 'instance_mute_page.dart';
 // **************************************************************************
 
 String _$instanceMutePageNotifierHash() =>
-    r'25fa6134066705f61829b9c34608844c6bf0e456';
+    r'66d63bb0c86f7bec0da2078bfcaff5f43a86d50f';
 
 /// See also [InstanceMutePageNotifier].
 @ProviderFor(InstanceMutePageNotifier)
