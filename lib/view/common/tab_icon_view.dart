@@ -10,12 +10,14 @@ class TabIconView extends ConsumerWidget {
   final TabIcon? icon;
   final Color? color;
   final double? size;
+  final bool isAttachTooltip;
 
   const TabIconView({
     required this.icon,
     super.key,
     this.color,
     this.size,
+    this.isAttachTooltip = true,
   });
 
   @override
@@ -42,6 +44,7 @@ class TabIconView extends ConsumerWidget {
         ),
         size: iconSize,
         forceSquare: true,
+        isAttachTooltip: isAttachTooltip,
       );
     }
     return const SizedBox.shrink();

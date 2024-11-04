@@ -164,24 +164,32 @@ class TimeLinePageState extends ConsumerState<TimeLinePage> {
             (index, tabSetting) {
               final account = ref.watch(accountProvider(tabSetting.acct));
               return Ink(
-                color: tabSetting == currentTabSetting
-                    ? AppTheme.of(context).currentDisplayTabColor
-                    : Colors.transparent,
-                child: AccountContextScope.as(
-                  account: account,
-                  child: IconButton(
-                    icon: TabIconView(
-                      icon: tabSetting.icon,
-                      color: tabSetting == currentTabSetting
-                          ? Theme.of(context).primaryColor
-                          : Colors.white,
+                  color: tabSetting == currentTabSetting
+                      ? AppTheme.of(context).currentDisplayTabColor
+                      : Colors.transparent,
+                  child: AccountContextScope.as(
+                    account: account,
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 48,
+                      height: 48,
+                      child: InkWell(
+                        child: Ink(
+                            child: TabIconView(
+                              isAttachTooltip: false,
+                          icon: tabSetting.icon,
+                          color: tabSetting == currentTabSetting
+                              ? Theme.of(context).primaryColor
+                              : Colors.white,
+                        )),
+                        onTap: () => tabSetting == currentTabSetting
+                            ? reload()
+                            : pageController.jumpToPage(index),
+                        onLongPress: () async => context.pushRoute(
+                                TimelineModalRoute(account: account,)),
+                      ),
                     ),
-                    onPressed: () => tabSetting == currentTabSetting
-                        ? reload()
-                        : pageController.jumpToPage(index),
-                  ),
-                ),
-              );
+                  ));
             },
           ).toList(),
         ),

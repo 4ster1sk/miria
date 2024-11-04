@@ -71,6 +71,10 @@ import "package:miria/view/share_extension_page/share_extension_page.dart";
 import "package:miria/view/sharing_account_select_page/account_select_page.dart";
 import "package:miria/view/splash_page/splash_page.dart";
 import "package:miria/view/time_line_page/time_line_page.dart";
+import "package:miria/view/timeline_modal_sheet/antenna_select_modal_sheet.dart";
+import "package:miria/view/timeline_modal_sheet/channel_select_modal_sheet.dart";
+import "package:miria/view/timeline_modal_sheet/list_select_modal_sheet.dart";
+import "package:miria/view/timeline_modal_sheet/timeline_modal_sheet.dart";
 import "package:miria/view/user_page/antenna_modal_sheet.dart";
 import "package:miria/view/user_page/update_memo_dialog.dart";
 import "package:miria/view/user_page/user_control_dialog.dart";
@@ -170,6 +174,10 @@ class AppRouter extends _$AppRouter {
     AutoModalRouteSheet(page: AntennaModalRoute.page),
     AutoModalRouteSheet(page: ClipModalRoute.page),
     AutoModalRouteSheet(page: UsersListModalRoute.page),
+    AutoModalRouteSheet(page: TimelineModalRoute.page),
+    AutoModalRouteSheet(page: ListSelectModalRoute.page),
+    AutoModalRouteSheet(page: AntennaSelectModalRoute.page),
+    AutoModalRouteSheet(page: ChannelSelectModalRoute.page),
     AutoModalRouteSheet<DriveModalSheetReturnValue>(page: DriveModalRoute.page),
   ];
 }

@@ -103,16 +103,28 @@ abstract class _$AppRouter extends RootStackRouter {
         )),
       );
     },
+    AntennaSelectModalRoute.name: (routeData) {
+      final args = routeData.argsAs<AntennaSelectModalRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: WrappedRoute(
+            child: AntennaSelectModalSheet(
+          account: args.account,
+          key: args.key,
+        )),
+      );
+    },
     AntennaSettingsRoute.name: (routeData) {
       final args = routeData.argsAs<AntennaSettingsRouteArgs>();
       return AutoRoutePage<AntennaSettings>(
         routeData: routeData,
-        child: AntennaSettingsDialog(
+        child: WrappedRoute(
+            child: AntennaSettingsDialog(
           account: args.account,
           key: args.key,
           title: args.title,
           initialSettings: args.initialSettings,
-        ),
+        )),
       );
     },
     AppInfoRoute.name: (routeData) {
@@ -161,6 +173,17 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: WrappedRoute(
             child: ChannelSelectDialog(
+          account: args.account,
+          key: args.key,
+        )),
+      );
+    },
+    ChannelSelectModalRoute.name: (routeData) {
+      final args = routeData.argsAs<ChannelSelectModalRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: WrappedRoute(
+            child: ChannelSelectModalSheet(
           account: args.account,
           key: args.key,
         )),
@@ -354,6 +377,17 @@ abstract class _$AppRouter extends RootStackRouter {
         child: WrappedRoute(
             child: LicenseConfirmDialog(
           emoji: args.emoji,
+          account: args.account,
+          key: args.key,
+        )),
+      );
+    },
+    ListSelectModalRoute.name: (routeData) {
+      final args = routeData.argsAs<ListSelectModalRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: WrappedRoute(
+            child: ListSelectModalSheet(
           account: args.account,
           key: args.key,
         )),
@@ -640,6 +674,16 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: TimeLinePage(
           initialTabSetting: args.initialTabSetting,
+          key: args.key,
+        ),
+      );
+    },
+    TimelineModalRoute.name: (routeData) {
+      final args = routeData.argsAs<TimelineModalRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: TimelineModalSheet(
+          account: args.account,
           key: args.key,
         ),
       );
@@ -1107,6 +1151,45 @@ class AntennaSelectRouteArgs {
 }
 
 /// generated route for
+/// [AntennaSelectModalSheet]
+class AntennaSelectModalRoute
+    extends PageRouteInfo<AntennaSelectModalRouteArgs> {
+  AntennaSelectModalRoute({
+    required Account account,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          AntennaSelectModalRoute.name,
+          args: AntennaSelectModalRouteArgs(
+            account: account,
+            key: key,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'AntennaSelectModalRoute';
+
+  static const PageInfo<AntennaSelectModalRouteArgs> page =
+      PageInfo<AntennaSelectModalRouteArgs>(name);
+}
+
+class AntennaSelectModalRouteArgs {
+  const AntennaSelectModalRouteArgs({
+    required this.account,
+    this.key,
+  });
+
+  final Account account;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'AntennaSelectModalRouteArgs{account: $account, key: $key}';
+  }
+}
+
+/// generated route for
 /// [AntennaSettingsDialog]
 class AntennaSettingsRoute extends PageRouteInfo<AntennaSettingsRouteArgs> {
   AntennaSettingsRoute({
@@ -1328,6 +1411,45 @@ class ChannelSelectRouteArgs {
   @override
   String toString() {
     return 'ChannelSelectRouteArgs{account: $account, key: $key}';
+  }
+}
+
+/// generated route for
+/// [ChannelSelectModalSheet]
+class ChannelSelectModalRoute
+    extends PageRouteInfo<ChannelSelectModalRouteArgs> {
+  ChannelSelectModalRoute({
+    required Account account,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ChannelSelectModalRoute.name,
+          args: ChannelSelectModalRouteArgs(
+            account: account,
+            key: key,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ChannelSelectModalRoute';
+
+  static const PageInfo<ChannelSelectModalRouteArgs> page =
+      PageInfo<ChannelSelectModalRouteArgs>(name);
+}
+
+class ChannelSelectModalRouteArgs {
+  const ChannelSelectModalRouteArgs({
+    required this.account,
+    this.key,
+  });
+
+  final Account account;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'ChannelSelectModalRouteArgs{account: $account, key: $key}';
   }
 }
 
@@ -1980,6 +2102,44 @@ class LicenseConfirmRouteArgs {
   @override
   String toString() {
     return 'LicenseConfirmRouteArgs{emoji: $emoji, account: $account, key: $key}';
+  }
+}
+
+/// generated route for
+/// [ListSelectModalSheet]
+class ListSelectModalRoute extends PageRouteInfo<ListSelectModalRouteArgs> {
+  ListSelectModalRoute({
+    required Account account,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ListSelectModalRoute.name,
+          args: ListSelectModalRouteArgs(
+            account: account,
+            key: key,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ListSelectModalRoute';
+
+  static const PageInfo<ListSelectModalRouteArgs> page =
+      PageInfo<ListSelectModalRouteArgs>(name);
+}
+
+class ListSelectModalRouteArgs {
+  const ListSelectModalRouteArgs({
+    required this.account,
+    this.key,
+  });
+
+  final Account account;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'ListSelectModalRouteArgs{account: $account, key: $key}';
   }
 }
 
@@ -2979,6 +3139,44 @@ class TimeLineRouteArgs {
   @override
   String toString() {
     return 'TimeLineRouteArgs{initialTabSetting: $initialTabSetting, key: $key}';
+  }
+}
+
+/// generated route for
+/// [TimelineModalSheet]
+class TimelineModalRoute extends PageRouteInfo<TimelineModalRouteArgs> {
+  TimelineModalRoute({
+    required Account account,
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          TimelineModalRoute.name,
+          args: TimelineModalRouteArgs(
+            account: account,
+            key: key,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'TimelineModalRoute';
+
+  static const PageInfo<TimelineModalRouteArgs> page =
+      PageInfo<TimelineModalRouteArgs>(name);
+}
+
+class TimelineModalRouteArgs {
+  const TimelineModalRouteArgs({
+    required this.account,
+    this.key,
+  });
+
+  final Account account;
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'TimelineModalRouteArgs{account: $account, key: $key}';
   }
 }
 
