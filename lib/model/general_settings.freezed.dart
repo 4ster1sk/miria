@@ -65,6 +65,7 @@ mixin _$GeneralSettings {
 
   /// `$[font.fantasy のフォント名
   String get fantasyFontName => throw _privateConstructorUsedError;
+  bool get reactionSearchAutofocus => throw _privateConstructorUsedError;
 
   /// 言語設定
   Languages get languages => throw _privateConstructorUsedError;
@@ -106,6 +107,7 @@ abstract class $GeneralSettingsCopyWith<$Res> {
       String monospaceFontName,
       String cursiveFontName,
       String fantasyFontName,
+      bool reactionSearchAutofocus,
       Languages languages,
       bool isDeckMode});
 }
@@ -142,6 +144,7 @@ class _$GeneralSettingsCopyWithImpl<$Res, $Val extends GeneralSettings>
     Object? monospaceFontName = null,
     Object? cursiveFontName = null,
     Object? fantasyFontName = null,
+    Object? reactionSearchAutofocus = null,
     Object? languages = null,
     Object? isDeckMode = null,
   }) {
@@ -214,6 +217,10 @@ class _$GeneralSettingsCopyWithImpl<$Res, $Val extends GeneralSettings>
           ? _value.fantasyFontName
           : fantasyFontName // ignore: cast_nullable_to_non_nullable
               as String,
+      reactionSearchAutofocus: null == reactionSearchAutofocus
+          ? _value.reactionSearchAutofocus
+          : reactionSearchAutofocus // ignore: cast_nullable_to_non_nullable
+              as bool,
       languages: null == languages
           ? _value.languages
           : languages // ignore: cast_nullable_to_non_nullable
@@ -252,6 +259,7 @@ abstract class _$$GeneralSettingsImplCopyWith<$Res>
       String monospaceFontName,
       String cursiveFontName,
       String fantasyFontName,
+      bool reactionSearchAutofocus,
       Languages languages,
       bool isDeckMode});
 }
@@ -286,6 +294,7 @@ class __$$GeneralSettingsImplCopyWithImpl<$Res>
     Object? monospaceFontName = null,
     Object? cursiveFontName = null,
     Object? fantasyFontName = null,
+    Object? reactionSearchAutofocus = null,
     Object? languages = null,
     Object? isDeckMode = null,
   }) {
@@ -358,6 +367,10 @@ class __$$GeneralSettingsImplCopyWithImpl<$Res>
           ? _value.fantasyFontName
           : fantasyFontName // ignore: cast_nullable_to_non_nullable
               as String,
+      reactionSearchAutofocus: null == reactionSearchAutofocus
+          ? _value.reactionSearchAutofocus
+          : reactionSearchAutofocus // ignore: cast_nullable_to_non_nullable
+              as bool,
       languages: null == languages
           ? _value.languages
           : languages // ignore: cast_nullable_to_non_nullable
@@ -391,6 +404,7 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
       this.monospaceFontName = "",
       this.cursiveFontName = "",
       this.fantasyFontName = "",
+      this.reactionSearchAutofocus = true,
       this.languages = Languages.jaJP,
       this.isDeckMode = false});
 
@@ -476,6 +490,9 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
   @override
   @JsonKey()
   final String fantasyFontName;
+  @override
+  @JsonKey()
+  final bool reactionSearchAutofocus;
 
   /// 言語設定
   @override
@@ -489,7 +506,7 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
 
   @override
   String toString() {
-    return 'GeneralSettings(lightColorThemeId: $lightColorThemeId, darkColorThemeId: $darkColorThemeId, themeColorSystem: $themeColorSystem, nsfwInherit: $nsfwInherit, enableDirectReaction: $enableDirectReaction, automaticPush: $automaticPush, enableAnimatedMFM: $enableAnimatedMFM, enableLongTextElipsed: $enableLongTextElipsed, enableFavoritedRenoteElipsed: $enableFavoritedRenoteElipsed, tabPosition: $tabPosition, textScaleFactor: $textScaleFactor, emojiType: $emojiType, defaultFontName: $defaultFontName, serifFontName: $serifFontName, monospaceFontName: $monospaceFontName, cursiveFontName: $cursiveFontName, fantasyFontName: $fantasyFontName, languages: $languages, isDeckMode: $isDeckMode)';
+    return 'GeneralSettings(lightColorThemeId: $lightColorThemeId, darkColorThemeId: $darkColorThemeId, themeColorSystem: $themeColorSystem, nsfwInherit: $nsfwInherit, enableDirectReaction: $enableDirectReaction, automaticPush: $automaticPush, enableAnimatedMFM: $enableAnimatedMFM, enableLongTextElipsed: $enableLongTextElipsed, enableFavoritedRenoteElipsed: $enableFavoritedRenoteElipsed, tabPosition: $tabPosition, textScaleFactor: $textScaleFactor, emojiType: $emojiType, defaultFontName: $defaultFontName, serifFontName: $serifFontName, monospaceFontName: $monospaceFontName, cursiveFontName: $cursiveFontName, fantasyFontName: $fantasyFontName, reactionSearchAutofocus: $reactionSearchAutofocus, languages: $languages, isDeckMode: $isDeckMode)';
   }
 
   @override
@@ -533,6 +550,9 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
                 other.cursiveFontName == cursiveFontName) &&
             (identical(other.fantasyFontName, fantasyFontName) ||
                 other.fantasyFontName == fantasyFontName) &&
+            (identical(
+                    other.reactionSearchAutofocus, reactionSearchAutofocus) ||
+                other.reactionSearchAutofocus == reactionSearchAutofocus) &&
             (identical(other.languages, languages) ||
                 other.languages == languages) &&
             (identical(other.isDeckMode, isDeckMode) ||
@@ -560,6 +580,7 @@ class _$GeneralSettingsImpl implements _GeneralSettings {
         monospaceFontName,
         cursiveFontName,
         fantasyFontName,
+        reactionSearchAutofocus,
         languages,
         isDeckMode
       ]);
@@ -600,6 +621,7 @@ abstract class _GeneralSettings implements GeneralSettings {
       final String monospaceFontName,
       final String cursiveFontName,
       final String fantasyFontName,
+      final bool reactionSearchAutofocus,
       final Languages languages,
       final bool isDeckMode}) = _$GeneralSettingsImpl;
 
@@ -668,6 +690,8 @@ abstract class _GeneralSettings implements GeneralSettings {
   /// `$[font.fantasy のフォント名
   @override
   String get fantasyFontName;
+  @override
+  bool get reactionSearchAutofocus;
 
   /// 言語設定
   @override
