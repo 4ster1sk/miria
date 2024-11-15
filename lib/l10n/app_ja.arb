@@ -991,6 +991,7 @@
     "unsupportedFile": "対応してないファイルやわ",
     "unsupportedFileWithFilename": "{filename}は対応してないファイルやわ",
     "failedFileSave": "ファイルの保存に失敗したみたいや",
+    "failedChooseFile": "ファイルの添付に失敗したみたいや",
 
     "misskeyGames": "Misskey Games",
     "cookieCliker": "Cookie Cliker",

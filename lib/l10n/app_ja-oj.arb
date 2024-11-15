@@ -110,6 +110,7 @@
     "unsupportedFile": "対応してないファイルのようですわ",
     "unsupportedFileWithFilename": "{filename}は対応してないファイルのようですわ",
     "failedFileSave": "ファイルの保存に失敗したようですわね…",
+    "failedChooseFile": "ファイルの添付に失敗したようですわね…",
 
     "nothingHere": "ここには何もありませんわ"
 

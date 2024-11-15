@@ -600,43 +600,50 @@ class NoteCreateNotifier extends _$NoteCreateNotifier {
         ],
       );
     } else if (result == DriveModalSheetReturnValue.upload) {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: true,
-        allowCompression: Platform.isIOS, // v8.1.3ではiOS以外でこの値を使用していない
-        compressionQuality: 0, // Androidでは0にすることで圧縮パススルー
-      );
-      if (result == null || result.files.isEmpty) return;
+      try {
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: true,
+          allowCompression: Platform.isIOS, // v8.1.3ではiOS以外でこの値を使用していない
+          compressionQuality: 0, // Androidでは0にすることで圧縮パススルー
+        );
+        if (result == null || result.files.isEmpty) return;
 
-      final fsFiles = result.files.map((file) {
-        final path = file.path;
-        if (path != null) {
-          return _fileSystem.file(path);
-        }
-        return null;
-      }).nonNulls;
-      final files = await Future.wait(
-        fsFiles.map(
-          (file) async {
-            final d = await loadImage(file);
-            if (d.data.isEmpty) {
-              await _dialogNotifier.showSimpleDialog(
-                message: (context) =>
-                    S.of(context).unsupportedFileWithFilename(file.basename),
-              );
-              return null;
-            }
-            return d;
-          },
-        ),
-      );
+        final fsFiles = result.files.map((file) {
+          final path = file.path;
+          if (path != null) {
+            return _fileSystem.file(path);
+          }
+          return null;
+        }).nonNulls;
+        final files = await Future.wait(
+          fsFiles.map(
+            (file) async {
+              final d = await loadImage(file);
+              if (d.data.isEmpty) {
+                await _dialogNotifier.showSimpleDialog(
+                  message: (context) =>
+                      S.of(context).unsupportedFileWithFilename(file.basename),
+                );
+                return null;
+              }
+              return d;
+            },
+          ),
+        );
 
-      state = state.copyWith(
-        files: [
-          ...state.files,
-          ...files.nonNulls,
-        ],
-      );
+        state = state.copyWith(
+          files: [
+            ...state.files,
+            ...files.nonNulls,
+          ],
+        );
+      } catch (e) {
+        await _dialogNotifier.showSimpleDialog(
+          message: (context) => S.of(context).failedChooseFile,
+        );
+        return;
+      }
     }
   }
 
