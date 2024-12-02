@@ -119,12 +119,49 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
                     ],
                   ),
                 ),
-                SliverList.builder(
-                  itemCount: page.content.length,
-                  itemBuilder: (context, index) => PageContent(
-                    content: page.content[index],
-                    page: page,
-                  ),
+                FutureBuilder(
+                  future: (() async {
+                    for (final content in page.content) {
+                      for (final noteId in _getNoteIds(content).toSet()) {
+                        try {
+                          if (ref
+                              .read(notesWithProvider)
+                              .notes
+                              .containsKey(noteId)) {
+                            continue;
+                          }
+
+                          final note = await ref
+                              .read(misskeyProvider(accountContext.getAccount))
+                              .notes
+                              .show(misskey.NotesShowRequest(noteId: noteId));
+
+                          ref.read(notesWithProvider).registerNote(note);
+                        } catch (_, s) {
+                          print(s);
+                        }
+                      }
+                    }
+                    return true;
+                  })(),
+                  builder: (context, snapshot) {
+                    return (snapshot.hasData)
+                        ? SliverList.builder(
+                            itemCount: page.content.length,
+                            itemBuilder: (context, index) => PageContent(
+                              content: page.content[index],
+                              page: page,
+                            ),
+                          )
+                        : const SliverPadding(
+                            padding: EdgeInsets.all(20),
+                            sliver: SliverToBoxAdapter(
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                          );
+                  },
                 ),
                 SliverToBoxAdapter(
                   child: Column(
@@ -178,6 +215,21 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
         ),
       ),
     );
+  }
+
+  // page内の全ノートIDを取り出す
+  List<String> _getNoteIds(misskey.AbstractPageContent content) {
+    final l = <String>[];
+    if (content is misskey.PageSection) {
+      for (final c in content.children) {
+        l.addAll(_getNoteIds(c));
+      }
+    } else if (content is misskey.PageNote) {
+      if (content.note != null) {
+        l.add(content.note!);
+      }
+    }
+    return l;
   }
 }
 
@@ -245,17 +297,13 @@ class PageContent extends ConsumerWidget {
       }
     }
     if (content case misskey.PageNote(note: final noteId?)) {
-      final note = ref.watch(fetchNoteProvider(noteId));
-      return switch (note) {
-        AsyncLoading() => const Center(
-            child: SizedBox.square(
-              dimension: 20,
-              child: CircularProgressIndicator.adaptive(),
-            ),
-          ),
-        AsyncError() => Text(S.of(context).thrownError),
-        AsyncData(:final value) => MisskeyNote(note: value)
-      };
+      if (!ref.read(notesWithProvider).notes.containsKey(noteId)) {
+        return Text(S.of(context).thrownError);
+      }
+      return MisskeyNote(
+        note: ref.read(notesWithProvider).notes[noteId]!,
+      );
+
     }
     if (content is misskey.PageSection) {
       return Padding(
