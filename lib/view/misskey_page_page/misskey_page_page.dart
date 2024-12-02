@@ -38,6 +38,30 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
   Widget wrappedRoute(BuildContext context) =>
       AccountContextScope(context: accountContext, child: this);
 
+  Uri get pageUri => Uri(
+        scheme: "https",
+        host: accountContext.getAccount.host,
+        pathSegments: [
+          "@${page.user.username}",
+          "pages",
+          page.name,
+        ],
+      );
+  Future<void> copyPageLink(BuildContext context) async {
+    await Clipboard.setData(
+      ClipboardData(
+        text: pageUri.toString(),
+      ),
+    );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(S.of(context).doneCopy),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accountHost = ref.read(accountContextProvider).getAccount.host;
@@ -71,17 +95,7 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
                       alignment: WrapAlignment.end,
                       children: [
                         OutlinedButton(
-                          onPressed: () async => launchUrl(
-                            Uri(
-                              scheme: "https",
-                              host: accountHost,
-                              pathSegments: [
-                                "@${page.user.username}",
-                                "pages",
-                                page.name,
-                              ],
-                            ),
-                          ),
+                          onPressed: () async => launchUrl(pageUri),
                           child: Text(
                             S.of(context).openBrowsers,
                             style: AppTheme.of(context).linkStyle,
@@ -89,19 +103,7 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
                         ),
                         OutlinedButton(
                           onPressed: () async {
-                            await Clipboard.setData(
-                              ClipboardData(
-                                text:
-                                    "https://$accountHost/@${page.user.username}/pages/${page.name}",
-                              ),
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(S.of(context).doneCopy),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
+                            await copyPageLink(context);
                           },
                           child: const Icon(Icons.link),
                         ),
@@ -129,17 +131,7 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
                         userId: page.userId,
                       ),
                       OutlinedButton(
-                        onPressed: () async => launchUrl(
-                          Uri(
-                            scheme: "https",
-                            host: accountHost,
-                            pathSegments: [
-                              "@${page.user.username}",
-                              "pages",
-                              page.name,
-                            ],
-                          ),
-                        ),
+                        onPressed: () async => launchUrl(pageUri),
                         child: Text(
                           S.of(context).openBrowsers,
                           style: AppTheme.of(context).linkStyle,
@@ -147,19 +139,7 @@ class MisskeyPagePage extends ConsumerWidget implements AutoRouteWrapper {
                       ),
                       OutlinedButton(
                         onPressed: () async {
-                          await Clipboard.setData(
-                            ClipboardData(
-                              text:
-                                  "https://$accountHost/@${page.user.username}/pages/${page.name}",
-                            ),
-                          );
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(S.of(context).doneCopy),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
+                          await copyPageLink(context);
                         },
                         child: const Icon(Icons.link),
                       ),
