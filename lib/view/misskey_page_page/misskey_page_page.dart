@@ -261,6 +261,9 @@ class PageContent extends ConsumerWidget {
         ),
       );
     }
+    if (content.type == null) {
+      return const SizedBox();
+    }
 
     return SizedBox(
       width: double.infinity,
