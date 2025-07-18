@@ -7,6 +7,7 @@ import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:image_editor/image_editor.dart";
+import "package:mime/mime.dart";
 import "package:miria/model/image_file.dart";
 import "package:miria/model/misskey_emoji_data.dart";
 import "package:miria/providers.dart";
@@ -33,6 +34,7 @@ abstract class PhotoEdit with _$PhotoEdit {
     @Default(Size.zero) Size actualSize,
     @Default(0) int angle,
     @Default([]) List<EditedEmojiData> emojis,
+    @Default("") mime,
     int? selectedEmojiIndex,
   }) = _PhotoEdit;
 }
@@ -88,6 +90,7 @@ class PhotoEditStateNotifier extends _$PhotoEditStateNotifier {
       editedImage: initialImage,
       defaultSize: defaultSize,
       cropSize: defaultSize,
+      mime: lookupMimeType(file.fileName, headerBytes: initialImage),
     );
   }
 
@@ -156,7 +159,10 @@ class PhotoEditStateNotifier extends _$PhotoEditStateNotifier {
             width: state.cropSize.width,
             height: state.cropSize.height,
           ),
-        ]),
+        ])
+        ..outputFormat = (state.mime == "image/png")
+            ? OutputFormat.png()
+            : OutputFormat.jpeg(95),
     );
     return removedPaddingImage;
   }

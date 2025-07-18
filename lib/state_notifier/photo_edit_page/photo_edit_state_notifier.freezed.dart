@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PhotoEdit {
 
- bool get clipMode; bool get colorFilterMode; List<ColorFilterPreview> get colorFilterPreviewImages; List<String> get adaptivePresets; bool get isInitialized; Uint8List? get initialImage; Uint8List? get editedImage; Offset get cropOffset; Size get cropSize; Size get defaultSize; Size get actualSize; int get angle; List<EditedEmojiData> get emojis; int? get selectedEmojiIndex;
+ bool get clipMode; bool get colorFilterMode; List<ColorFilterPreview> get colorFilterPreviewImages; List<String> get adaptivePresets; bool get isInitialized; Uint8List? get initialImage; Uint8List? get editedImage; Offset get cropOffset; Size get cropSize; Size get defaultSize; Size get actualSize; int get angle; List<EditedEmojiData> get emojis; dynamic get mime; int? get selectedEmojiIndex;
 /// Create a copy of PhotoEdit
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $PhotoEditCopyWith<PhotoEdit> get copyWith => _$PhotoEditCopyWithImpl<PhotoEdit>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PhotoEdit&&(identical(other.clipMode, clipMode) || other.clipMode == clipMode)&&(identical(other.colorFilterMode, colorFilterMode) || other.colorFilterMode == colorFilterMode)&&const DeepCollectionEquality().equals(other.colorFilterPreviewImages, colorFilterPreviewImages)&&const DeepCollectionEquality().equals(other.adaptivePresets, adaptivePresets)&&(identical(other.isInitialized, isInitialized) || other.isInitialized == isInitialized)&&const DeepCollectionEquality().equals(other.initialImage, initialImage)&&const DeepCollectionEquality().equals(other.editedImage, editedImage)&&(identical(other.cropOffset, cropOffset) || other.cropOffset == cropOffset)&&(identical(other.cropSize, cropSize) || other.cropSize == cropSize)&&(identical(other.defaultSize, defaultSize) || other.defaultSize == defaultSize)&&(identical(other.actualSize, actualSize) || other.actualSize == actualSize)&&(identical(other.angle, angle) || other.angle == angle)&&const DeepCollectionEquality().equals(other.emojis, emojis)&&(identical(other.selectedEmojiIndex, selectedEmojiIndex) || other.selectedEmojiIndex == selectedEmojiIndex));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PhotoEdit&&(identical(other.clipMode, clipMode) || other.clipMode == clipMode)&&(identical(other.colorFilterMode, colorFilterMode) || other.colorFilterMode == colorFilterMode)&&const DeepCollectionEquality().equals(other.colorFilterPreviewImages, colorFilterPreviewImages)&&const DeepCollectionEquality().equals(other.adaptivePresets, adaptivePresets)&&(identical(other.isInitialized, isInitialized) || other.isInitialized == isInitialized)&&const DeepCollectionEquality().equals(other.initialImage, initialImage)&&const DeepCollectionEquality().equals(other.editedImage, editedImage)&&(identical(other.cropOffset, cropOffset) || other.cropOffset == cropOffset)&&(identical(other.cropSize, cropSize) || other.cropSize == cropSize)&&(identical(other.defaultSize, defaultSize) || other.defaultSize == defaultSize)&&(identical(other.actualSize, actualSize) || other.actualSize == actualSize)&&(identical(other.angle, angle) || other.angle == angle)&&const DeepCollectionEquality().equals(other.emojis, emojis)&&const DeepCollectionEquality().equals(other.mime, mime)&&(identical(other.selectedEmojiIndex, selectedEmojiIndex) || other.selectedEmojiIndex == selectedEmojiIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,clipMode,colorFilterMode,const DeepCollectionEquality().hash(colorFilterPreviewImages),const DeepCollectionEquality().hash(adaptivePresets),isInitialized,const DeepCollectionEquality().hash(initialImage),const DeepCollectionEquality().hash(editedImage),cropOffset,cropSize,defaultSize,actualSize,angle,const DeepCollectionEquality().hash(emojis),selectedEmojiIndex);
+int get hashCode => Object.hash(runtimeType,clipMode,colorFilterMode,const DeepCollectionEquality().hash(colorFilterPreviewImages),const DeepCollectionEquality().hash(adaptivePresets),isInitialized,const DeepCollectionEquality().hash(initialImage),const DeepCollectionEquality().hash(editedImage),cropOffset,cropSize,defaultSize,actualSize,angle,const DeepCollectionEquality().hash(emojis),const DeepCollectionEquality().hash(mime),selectedEmojiIndex);
 
 @override
 String toString() {
-  return 'PhotoEdit(clipMode: $clipMode, colorFilterMode: $colorFilterMode, colorFilterPreviewImages: $colorFilterPreviewImages, adaptivePresets: $adaptivePresets, isInitialized: $isInitialized, initialImage: $initialImage, editedImage: $editedImage, cropOffset: $cropOffset, cropSize: $cropSize, defaultSize: $defaultSize, actualSize: $actualSize, angle: $angle, emojis: $emojis, selectedEmojiIndex: $selectedEmojiIndex)';
+  return 'PhotoEdit(clipMode: $clipMode, colorFilterMode: $colorFilterMode, colorFilterPreviewImages: $colorFilterPreviewImages, adaptivePresets: $adaptivePresets, isInitialized: $isInitialized, initialImage: $initialImage, editedImage: $editedImage, cropOffset: $cropOffset, cropSize: $cropSize, defaultSize: $defaultSize, actualSize: $actualSize, angle: $angle, emojis: $emojis, mime: $mime, selectedEmojiIndex: $selectedEmojiIndex)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $PhotoEditCopyWith<$Res>  {
   factory $PhotoEditCopyWith(PhotoEdit value, $Res Function(PhotoEdit) _then) = _$PhotoEditCopyWithImpl;
 @useResult
 $Res call({
- bool clipMode, bool colorFilterMode, List<ColorFilterPreview> colorFilterPreviewImages, List<String> adaptivePresets, bool isInitialized, Uint8List? initialImage, Uint8List? editedImage, Offset cropOffset, Size cropSize, Size defaultSize, Size actualSize, int angle, List<EditedEmojiData> emojis, int? selectedEmojiIndex
+ bool clipMode, bool colorFilterMode, List<ColorFilterPreview> colorFilterPreviewImages, List<String> adaptivePresets, bool isInitialized, Uint8List? initialImage, Uint8List? editedImage, Offset cropOffset, Size cropSize, Size defaultSize, Size actualSize, int angle, List<EditedEmojiData> emojis, dynamic mime, int? selectedEmojiIndex
 });
 
 
@@ -63,7 +63,7 @@ class _$PhotoEditCopyWithImpl<$Res>
 
 /// Create a copy of PhotoEdit
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? clipMode = null,Object? colorFilterMode = null,Object? colorFilterPreviewImages = null,Object? adaptivePresets = null,Object? isInitialized = null,Object? initialImage = freezed,Object? editedImage = freezed,Object? cropOffset = null,Object? cropSize = null,Object? defaultSize = null,Object? actualSize = null,Object? angle = null,Object? emojis = null,Object? selectedEmojiIndex = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? clipMode = null,Object? colorFilterMode = null,Object? colorFilterPreviewImages = null,Object? adaptivePresets = null,Object? isInitialized = null,Object? initialImage = freezed,Object? editedImage = freezed,Object? cropOffset = null,Object? cropSize = null,Object? defaultSize = null,Object? actualSize = null,Object? angle = null,Object? emojis = null,Object? mime = freezed,Object? selectedEmojiIndex = freezed,}) {
   return _then(_self.copyWith(
 clipMode: null == clipMode ? _self.clipMode : clipMode // ignore: cast_nullable_to_non_nullable
 as bool,colorFilterMode: null == colorFilterMode ? _self.colorFilterMode : colorFilterMode // ignore: cast_nullable_to_non_nullable
@@ -78,7 +78,8 @@ as Size,defaultSize: null == defaultSize ? _self.defaultSize : defaultSize // ig
 as Size,actualSize: null == actualSize ? _self.actualSize : actualSize // ignore: cast_nullable_to_non_nullable
 as Size,angle: null == angle ? _self.angle : angle // ignore: cast_nullable_to_non_nullable
 as int,emojis: null == emojis ? _self.emojis : emojis // ignore: cast_nullable_to_non_nullable
-as List<EditedEmojiData>,selectedEmojiIndex: freezed == selectedEmojiIndex ? _self.selectedEmojiIndex : selectedEmojiIndex // ignore: cast_nullable_to_non_nullable
+as List<EditedEmojiData>,mime: freezed == mime ? _self.mime : mime // ignore: cast_nullable_to_non_nullable
+as dynamic,selectedEmojiIndex: freezed == selectedEmojiIndex ? _self.selectedEmojiIndex : selectedEmojiIndex // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -90,7 +91,7 @@ as int?,
 
 
 class _PhotoEdit implements PhotoEdit {
-  const _PhotoEdit({this.clipMode = false, this.colorFilterMode = false, final  List<ColorFilterPreview> colorFilterPreviewImages = const [], final  List<String> adaptivePresets = const [], this.isInitialized = false, this.initialImage, this.editedImage, this.cropOffset = const Offset(0, 0), this.cropSize = Size.zero, this.defaultSize = Size.zero, this.actualSize = Size.zero, this.angle = 0, final  List<EditedEmojiData> emojis = const [], this.selectedEmojiIndex}): _colorFilterPreviewImages = colorFilterPreviewImages,_adaptivePresets = adaptivePresets,_emojis = emojis;
+  const _PhotoEdit({this.clipMode = false, this.colorFilterMode = false, final  List<ColorFilterPreview> colorFilterPreviewImages = const [], final  List<String> adaptivePresets = const [], this.isInitialized = false, this.initialImage, this.editedImage, this.cropOffset = const Offset(0, 0), this.cropSize = Size.zero, this.defaultSize = Size.zero, this.actualSize = Size.zero, this.angle = 0, final  List<EditedEmojiData> emojis = const [], this.mime = "", this.selectedEmojiIndex}): _colorFilterPreviewImages = colorFilterPreviewImages,_adaptivePresets = adaptivePresets,_emojis = emojis;
   
 
 @override@JsonKey() final  bool clipMode;
@@ -124,6 +125,7 @@ class _PhotoEdit implements PhotoEdit {
   return EqualUnmodifiableListView(_emojis);
 }
 
+@override@JsonKey() final  dynamic mime;
 @override final  int? selectedEmojiIndex;
 
 /// Create a copy of PhotoEdit
@@ -136,16 +138,16 @@ _$PhotoEditCopyWith<_PhotoEdit> get copyWith => __$PhotoEditCopyWithImpl<_PhotoE
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PhotoEdit&&(identical(other.clipMode, clipMode) || other.clipMode == clipMode)&&(identical(other.colorFilterMode, colorFilterMode) || other.colorFilterMode == colorFilterMode)&&const DeepCollectionEquality().equals(other._colorFilterPreviewImages, _colorFilterPreviewImages)&&const DeepCollectionEquality().equals(other._adaptivePresets, _adaptivePresets)&&(identical(other.isInitialized, isInitialized) || other.isInitialized == isInitialized)&&const DeepCollectionEquality().equals(other.initialImage, initialImage)&&const DeepCollectionEquality().equals(other.editedImage, editedImage)&&(identical(other.cropOffset, cropOffset) || other.cropOffset == cropOffset)&&(identical(other.cropSize, cropSize) || other.cropSize == cropSize)&&(identical(other.defaultSize, defaultSize) || other.defaultSize == defaultSize)&&(identical(other.actualSize, actualSize) || other.actualSize == actualSize)&&(identical(other.angle, angle) || other.angle == angle)&&const DeepCollectionEquality().equals(other._emojis, _emojis)&&(identical(other.selectedEmojiIndex, selectedEmojiIndex) || other.selectedEmojiIndex == selectedEmojiIndex));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PhotoEdit&&(identical(other.clipMode, clipMode) || other.clipMode == clipMode)&&(identical(other.colorFilterMode, colorFilterMode) || other.colorFilterMode == colorFilterMode)&&const DeepCollectionEquality().equals(other._colorFilterPreviewImages, _colorFilterPreviewImages)&&const DeepCollectionEquality().equals(other._adaptivePresets, _adaptivePresets)&&(identical(other.isInitialized, isInitialized) || other.isInitialized == isInitialized)&&const DeepCollectionEquality().equals(other.initialImage, initialImage)&&const DeepCollectionEquality().equals(other.editedImage, editedImage)&&(identical(other.cropOffset, cropOffset) || other.cropOffset == cropOffset)&&(identical(other.cropSize, cropSize) || other.cropSize == cropSize)&&(identical(other.defaultSize, defaultSize) || other.defaultSize == defaultSize)&&(identical(other.actualSize, actualSize) || other.actualSize == actualSize)&&(identical(other.angle, angle) || other.angle == angle)&&const DeepCollectionEquality().equals(other._emojis, _emojis)&&const DeepCollectionEquality().equals(other.mime, mime)&&(identical(other.selectedEmojiIndex, selectedEmojiIndex) || other.selectedEmojiIndex == selectedEmojiIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,clipMode,colorFilterMode,const DeepCollectionEquality().hash(_colorFilterPreviewImages),const DeepCollectionEquality().hash(_adaptivePresets),isInitialized,const DeepCollectionEquality().hash(initialImage),const DeepCollectionEquality().hash(editedImage),cropOffset,cropSize,defaultSize,actualSize,angle,const DeepCollectionEquality().hash(_emojis),selectedEmojiIndex);
+int get hashCode => Object.hash(runtimeType,clipMode,colorFilterMode,const DeepCollectionEquality().hash(_colorFilterPreviewImages),const DeepCollectionEquality().hash(_adaptivePresets),isInitialized,const DeepCollectionEquality().hash(initialImage),const DeepCollectionEquality().hash(editedImage),cropOffset,cropSize,defaultSize,actualSize,angle,const DeepCollectionEquality().hash(_emojis),const DeepCollectionEquality().hash(mime),selectedEmojiIndex);
 
 @override
 String toString() {
-  return 'PhotoEdit(clipMode: $clipMode, colorFilterMode: $colorFilterMode, colorFilterPreviewImages: $colorFilterPreviewImages, adaptivePresets: $adaptivePresets, isInitialized: $isInitialized, initialImage: $initialImage, editedImage: $editedImage, cropOffset: $cropOffset, cropSize: $cropSize, defaultSize: $defaultSize, actualSize: $actualSize, angle: $angle, emojis: $emojis, selectedEmojiIndex: $selectedEmojiIndex)';
+  return 'PhotoEdit(clipMode: $clipMode, colorFilterMode: $colorFilterMode, colorFilterPreviewImages: $colorFilterPreviewImages, adaptivePresets: $adaptivePresets, isInitialized: $isInitialized, initialImage: $initialImage, editedImage: $editedImage, cropOffset: $cropOffset, cropSize: $cropSize, defaultSize: $defaultSize, actualSize: $actualSize, angle: $angle, emojis: $emojis, mime: $mime, selectedEmojiIndex: $selectedEmojiIndex)';
 }
 
 
@@ -156,7 +158,7 @@ abstract mixin class _$PhotoEditCopyWith<$Res> implements $PhotoEditCopyWith<$Re
   factory _$PhotoEditCopyWith(_PhotoEdit value, $Res Function(_PhotoEdit) _then) = __$PhotoEditCopyWithImpl;
 @override @useResult
 $Res call({
- bool clipMode, bool colorFilterMode, List<ColorFilterPreview> colorFilterPreviewImages, List<String> adaptivePresets, bool isInitialized, Uint8List? initialImage, Uint8List? editedImage, Offset cropOffset, Size cropSize, Size defaultSize, Size actualSize, int angle, List<EditedEmojiData> emojis, int? selectedEmojiIndex
+ bool clipMode, bool colorFilterMode, List<ColorFilterPreview> colorFilterPreviewImages, List<String> adaptivePresets, bool isInitialized, Uint8List? initialImage, Uint8List? editedImage, Offset cropOffset, Size cropSize, Size defaultSize, Size actualSize, int angle, List<EditedEmojiData> emojis, dynamic mime, int? selectedEmojiIndex
 });
 
 
@@ -173,7 +175,7 @@ class __$PhotoEditCopyWithImpl<$Res>
 
 /// Create a copy of PhotoEdit
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? clipMode = null,Object? colorFilterMode = null,Object? colorFilterPreviewImages = null,Object? adaptivePresets = null,Object? isInitialized = null,Object? initialImage = freezed,Object? editedImage = freezed,Object? cropOffset = null,Object? cropSize = null,Object? defaultSize = null,Object? actualSize = null,Object? angle = null,Object? emojis = null,Object? selectedEmojiIndex = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? clipMode = null,Object? colorFilterMode = null,Object? colorFilterPreviewImages = null,Object? adaptivePresets = null,Object? isInitialized = null,Object? initialImage = freezed,Object? editedImage = freezed,Object? cropOffset = null,Object? cropSize = null,Object? defaultSize = null,Object? actualSize = null,Object? angle = null,Object? emojis = null,Object? mime = freezed,Object? selectedEmojiIndex = freezed,}) {
   return _then(_PhotoEdit(
 clipMode: null == clipMode ? _self.clipMode : clipMode // ignore: cast_nullable_to_non_nullable
 as bool,colorFilterMode: null == colorFilterMode ? _self.colorFilterMode : colorFilterMode // ignore: cast_nullable_to_non_nullable
@@ -188,7 +190,8 @@ as Size,defaultSize: null == defaultSize ? _self.defaultSize : defaultSize // ig
 as Size,actualSize: null == actualSize ? _self.actualSize : actualSize // ignore: cast_nullable_to_non_nullable
 as Size,angle: null == angle ? _self.angle : angle // ignore: cast_nullable_to_non_nullable
 as int,emojis: null == emojis ? _self._emojis : emojis // ignore: cast_nullable_to_non_nullable
-as List<EditedEmojiData>,selectedEmojiIndex: freezed == selectedEmojiIndex ? _self.selectedEmojiIndex : selectedEmojiIndex // ignore: cast_nullable_to_non_nullable
+as List<EditedEmojiData>,mime: freezed == mime ? _self.mime : mime // ignore: cast_nullable_to_non_nullable
+as dynamic,selectedEmojiIndex: freezed == selectedEmojiIndex ? _self.selectedEmojiIndex : selectedEmojiIndex // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
