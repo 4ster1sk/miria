@@ -1013,11 +1013,11 @@ packages:
     dependency: "direct main"
     description:
       path: media_kit
-      ref: "28292926cfd1e75611f7dcf39248124197d131cf"
-      resolved-ref: "28292926cfd1e75611f7dcf39248124197d131cf"
+      ref: "1253286776b4ccd4d7883100c7cc6b6da2fa428f"
+      resolved-ref: "1253286776b4ccd4d7883100c7cc6b6da2fa428f"
       url: "https://github.com/4ster1sk/media-kit.git"
     source: git
-    version: "1.1.11"
+    version: "1.2.0"
   media_kit_libs_android_video:
     dependency: transitive
     description:
@@ -1070,11 +1070,11 @@ packages:
     dependency: "direct main"
     description:
       path: media_kit_video
-      ref: "28292926cfd1e75611f7dcf39248124197d131cf"
-      resolved-ref: "28292926cfd1e75611f7dcf39248124197d131cf"
+      ref: "1253286776b4ccd4d7883100c7cc6b6da2fa428f"
+      resolved-ref: "1253286776b4ccd4d7883100c7cc6b6da2fa428f"
       url: "https://github.com/4ster1sk/media-kit.git"
     source: git
-    version: "1.2.5"
+    version: "1.3.0"
   meta:
     dependency: transitive
     description:
@@ -1958,10 +1958,10 @@ packages:
     dependency: "direct main"
     description:
       name: volume_controller
-      sha256: c71d4c62631305df63b72da79089e078af2659649301807fa746088f365cb48e
+      sha256: d75039e69c0d90e7810bfd47e3eedf29ff8543ea7a10392792e81f9bded7edf5
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.8"
+    version: "3.4.0"
   wakelock_plus:
     dependency: transitive
     description:

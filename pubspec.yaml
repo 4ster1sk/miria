@@ -69,7 +69,7 @@ dependencies:
   media_kit_video: ^1.2.5
   media_kit_libs_video: ^1.0.5
   flutter_colorpicker: ^1.1.0
-  volume_controller: ^2.0.7
+  volume_controller: ^3.0.2
   window_manager: ^0.5.0
   shared_preference_app_group: ^1.0.0+1
   stack_trace: ^1.11.1
@@ -103,12 +103,12 @@ dependency_overrides:
   media_kit:
     git:
       url: https://github.com/4ster1sk/media-kit.git
-      ref: 28292926cfd1e75611f7dcf39248124197d131cf
+      ref: 1253286776b4ccd4d7883100c7cc6b6da2fa428f
       path: ./media_kit/
   media_kit_video:
     git:
       url: https://github.com/4ster1sk/media-kit.git
-      ref: 28292926cfd1e75611f7dcf39248124197d131cf
+      ref: 1253286776b4ccd4d7883100c7cc6b6da2fa428f
       path: ./media_kit_video/
 
 dev_dependencies:
