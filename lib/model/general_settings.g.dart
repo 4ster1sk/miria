@@ -39,6 +39,7 @@ _GeneralSettings _$GeneralSettingsFromJson(Map<String, dynamic> json) =>
       monospaceFontName: json['monospaceFontName'] as String? ?? "",
       cursiveFontName: json['cursiveFontName'] as String? ?? "",
       fantasyFontName: json['fantasyFontName'] as String? ?? "",
+      reactionSearchAutofocus: json['reactionSearchAutofocus'] as bool? ?? true,
       languages:
           $enumDecodeNullable(_$LanguagesEnumMap, json['languages']) ??
           Languages.jaJP,
@@ -104,6 +105,7 @@ Map<String, dynamic> _$GeneralSettingsToJson(_GeneralSettings instance) =>
       'monospaceFontName': instance.monospaceFontName,
       'cursiveFontName': instance.cursiveFontName,
       'fantasyFontName': instance.fantasyFontName,
+      'reactionSearchAutofocus': instance.reactionSearchAutofocus,
       'languages': _$LanguagesEnumMap[instance.languages]!,
       'isDeckMode': instance.isDeckMode,
       'lightNoteBackgroundPublic': const ColorConverter().toJson(
