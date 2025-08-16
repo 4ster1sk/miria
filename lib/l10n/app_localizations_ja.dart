@@ -2083,6 +2083,9 @@ class SJa extends S {
 
   @override
   String get goToChat => 'みにいく';
+
+  @override
+  String get noSearchResults => '検索結果が見つかりませんでした';
 }
 
 /// The translations for Japanese (`ja_OJ`).
@@ -2485,4 +2488,7 @@ class SJaOj extends SJa {
 
   @override
   String get goToChat => '参りましょう';
+
+  @override
+  String get noSearchResults => '検索結果が見つかりませんでしたわ';
 }
