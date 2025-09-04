@@ -3300,6 +3300,12 @@ abstract class S {
   /// **'更新された順'**
   String get updatedAtDescendingOrder;
 
+  /// No description provided for @loopPlayback.
+  ///
+  /// In ja, this message translates to:
+  /// **'ループ再生'**
+  String get loopPlayback;
+
   /// No description provided for @unsupportedFile.
   ///
   /// In ja, this message translates to:
