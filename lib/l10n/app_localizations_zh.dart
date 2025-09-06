@@ -1979,6 +1979,9 @@ class SZh extends S {
   String get profileAddField => '添加';
 
   @override
+  String get profileSetBirthday => '选择生日';
+
+  @override
   String get profileFollowedMessage => '被关注时的消息';
 
   @override
@@ -2078,6 +2081,36 @@ class SZh extends S {
 
   @override
   String get noSearchResults => '未找到搜索结果';
+
+  @override
+  String get saveToDrafts => '保存为草稿吗？';
+
+  @override
+  String get discard => '丢弃';
+
+  @override
+  String get drafts => '草稿';
+
+  @override
+  String get noDrafts => '没有草稿';
+
+  @override
+  String get confirmDeleteDraft => '要删除这个草稿吗？';
+
+  @override
+  String get emptyNote => '空笔记';
+
+  @override
+  String get poll => '投票';
+
+  @override
+  String get continueEditing => '继续编辑';
+
+  @override
+  String get saveAndClose => '保存并关闭';
+
+  @override
+  String get discardAndReturn => '放弃并返回';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3972,4 +4005,22 @@ class SZhCn extends SZh {
 
   @override
   String get noSearchResults => '未找到搜索结果';
+
+  @override
+  String get saveToDrafts => '保存为草稿吗？';
+
+  @override
+  String get discard => '丢弃';
+
+  @override
+  String get drafts => '草稿';
+
+  @override
+  String get noDrafts => '没有草稿';
+
+  @override
+  String get confirmDeleteDraft => '要删除这个草稿吗？';
+
+  @override
+  String get emptyNote => '空笔记';
 }

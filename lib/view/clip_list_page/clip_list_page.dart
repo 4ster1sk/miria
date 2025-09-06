@@ -9,7 +9,8 @@ import "package:miria/router/app_router.dart";
 import "package:miria/state_notifier/clip_list_page/clips_notifier.dart";
 import "package:miria/view/common/account_scope.dart";
 import "package:miria/view/common/clip_item.dart";
-import "package:miria/view/common/error_detail.dart";
+import "package:miria/view/common/pushable_listview.dart";
+import "package:misskey_dart/misskey_dart.dart";
 
 @RoutePage()
 class ClipListPage extends ConsumerWidget implements AutoRouteWrapper {
@@ -23,7 +24,7 @@ class ClipListPage extends ConsumerWidget implements AutoRouteWrapper {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clips = ref.watch(clipsNotifierProvider);
+    ref.listen(clipsNotifierProvider, (_, _) {});
 
     return Scaffold(
       appBar: AppBar(
@@ -42,24 +43,21 @@ class ClipListPage extends ConsumerWidget implements AutoRouteWrapper {
           ),
         ],
       ),
-      body: switch (clips) {
-        AsyncLoading() => const Center(
-          child: CircularProgressIndicator.adaptive(),
+      body: PushableListView<Clip>(
+        listKey: "clips_list",
+        initializeFuture: () async {
+          return await ref.read(clipsNotifierProvider.future);
+        },
+        nextFuture: (lastItem, _) async {
+          return await ref
+              .read(clipsNotifierProvider.notifier)
+              .loadClips(untilId: lastItem.id);
+        },
+        itemBuilder: (context, clip) => ClipItem(
+          clip: clip,
+          trailing: _RemoveButton(id: clip.id),
         ),
-        AsyncError(:final error, :final stackTrace) => Center(
-          child: ErrorDetail(error: error, stackTrace: stackTrace),
-        ),
-        AsyncData(:final value) => ListView.builder(
-          itemCount: value.length,
-          itemBuilder: (context, index) {
-            final clip = value[index];
-            return ClipItem(
-              clip: clip,
-              trailing: _RemoveButton(id: clip.id),
-            );
-          },
-        ),
-      },
+      ),
     );
   }
 }

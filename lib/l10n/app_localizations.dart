@@ -3447,8 +3447,14 @@ abstract class S {
   /// No description provided for @profileAddField.
   ///
   /// In ja, this message translates to:
-  /// **'追加'**
+  /// **'項目を追加'**
   String get profileAddField;
+
+  /// No description provided for @profileSetBirthday.
+  ///
+  /// In ja, this message translates to:
+  /// **'誕生日を選択'**
+  String get profileSetBirthday;
 
   /// No description provided for @profileFollowedMessage.
   ///
@@ -3647,6 +3653,66 @@ abstract class S {
   /// In ja, this message translates to:
   /// **'検索結果が見つかりませんでした'**
   String get noSearchResults;
+
+  /// No description provided for @saveToDrafts.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きに保存しとく？'**
+  String get saveToDrafts;
+
+  /// No description provided for @discard.
+  ///
+  /// In ja, this message translates to:
+  /// **'やめとく'**
+  String get discard;
+
+  /// No description provided for @drafts.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書き'**
+  String get drafts;
+
+  /// No description provided for @noDrafts.
+  ///
+  /// In ja, this message translates to:
+  /// **'下書きあらへんで'**
+  String get noDrafts;
+
+  /// No description provided for @confirmDeleteDraft.
+  ///
+  /// In ja, this message translates to:
+  /// **'この下書き削除してもええか？'**
+  String get confirmDeleteDraft;
+
+  /// No description provided for @emptyNote.
+  ///
+  /// In ja, this message translates to:
+  /// **'空っぽのノート'**
+  String get emptyNote;
+
+  /// No description provided for @poll.
+  ///
+  /// In ja, this message translates to:
+  /// **'アンケート'**
+  String get poll;
+
+  /// No description provided for @continueEditing.
+  ///
+  /// In ja, this message translates to:
+  /// **'もうちょっと編集を続ける'**
+  String get continueEditing;
+
+  /// No description provided for @saveAndClose.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存して閉じる'**
+  String get saveAndClose;
+
+  /// No description provided for @discardAndReturn.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存せずに戻る'**
+  String get discardAndReturn;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
