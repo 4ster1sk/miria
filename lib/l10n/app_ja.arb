@@ -1032,6 +1032,7 @@
     "updatedAtAscendingOrder": "更新されていない順",
     "updatedAtDescendingOrder": "更新された順",
 
+    "loopPlayback": "ループ再生",
     "unsupportedFile": "対応してないファイルやわ",
     "unsupportedFileWithFilename": "{filename}は対応してないファイルやわ",
     "@unsupportedFileWithFilename": {

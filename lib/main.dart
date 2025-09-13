@@ -7,7 +7,6 @@ import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:media_kit/media_kit.dart";
 import "package:miria/const.dart";
 import "package:miria/l10n/app_localizations.dart";
 import "package:miria/providers.dart";
@@ -20,7 +19,6 @@ import "package:window_manager/window_manager.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
   if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
     await windowManager.ensureInitialized();
   }

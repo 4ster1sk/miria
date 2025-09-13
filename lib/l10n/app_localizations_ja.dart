@@ -1908,6 +1908,9 @@ class SJa extends S {
   String get updatedAtDescendingOrder => '更新された順';
 
   @override
+  String get loopPlayback => 'ループ再生';
+
+  @override
   String get unsupportedFile => '対応してないファイルやわ';
 
   @override
