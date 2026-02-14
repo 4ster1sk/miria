@@ -32,8 +32,6 @@ jobs:
       - name: Build Snap
         id: snapcraft
         uses: canonical/snapcraft-multiarch-action@v1
-        with:
-          architecture: ${{ matrix.platform }}
 
       - name: Get Build Version
         run: |
