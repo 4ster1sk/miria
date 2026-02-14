@@ -115,13 +115,13 @@ jobs:
 
         - name: Set up flutter
           run: |
-            docker exec debian bash -c 'fvm install --setup'
+            docker exec debian bash -c '/root/fvm/bin/fvm install --setup'
         
         - name: Build
           run: |
             docker exec debian bash -c '
-                fvm flutter pub get
-                fvm flutter build linux --release
+                /root/fvm/bin/fvm flutter pub get
+                /root/fvm/bin/fvm flutter build linux --release
             '
 
         - name: Prepare Package
