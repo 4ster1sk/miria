@@ -16,9 +16,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            platform: linux/amd64
+            platform: amd64
           - os: ubuntu-24.04-arm
-            platform: linux/arm64
+            platform: arm64
     runs-on: ${{ matrix.os }}
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
@@ -64,9 +64,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            platform: linux/amd64
+            platform: amd64
           - os: ubuntu-24.04-arm
-            platform: linux/arm64
+            platform: arm64
     runs-on: ${{ matrix.os }}
     steps:
         - name: Clone repository
@@ -114,13 +114,13 @@ jobs:
 
         - name: Set up flutter
           run: |
-            docker exec debian bash -c 'fvm install --setup'
+            docker exec debian bash -c '/root/fvm/bin/fvm install --setup'
         
         - name: Build
           run: |
             docker exec debian bash -c '
-                fvm flutter pub get
-                fvm flutter build linux --release
+                /root/fvm/bin/fvm flutter pub get
+                /root/fvm/bin/fvm flutter build linux --release
             '
 
         - name: Prepare Package
