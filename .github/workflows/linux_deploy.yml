@@ -16,9 +16,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            platform: linux/amd64
+            platform: amd64
           - os: ubuntu-24.04-arm
-            platform: linux/arm64
+            platform: arm64
     runs-on: ${{ matrix.os }}
     outputs:
       snap: ${{ steps.snapcraft.outputs.snap }}
@@ -32,6 +32,8 @@ jobs:
       - name: Build Snap
         id: snapcraft
         uses: canonical/snapcraft-multiarch-action@v1
+        with:
+          architecture: ${{ matrix.platform }}
 
       - name: Get Build Version
         run: |
