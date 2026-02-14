@@ -97,7 +97,6 @@ jobs:
               -e PKG_DIR="$PKG_DIR" \
               -e ARCH="$ARCH" \
               -e VERSION="$VERSION" \
-              -e FVM_INSTALL_DIR="/usr/local/bin" \
               debian:bookworm \
               bash
 
