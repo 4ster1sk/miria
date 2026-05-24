@@ -1,12 +1,3 @@
-# コードスタイル
-
-- ファイル変更後は`dart format .`を常に実行してください。
-
-# テスト
-
-- ソース修正時は`flutter test`を実行し、失敗したものを抽出して修正してください。
-- 新しい機能を実装する場合は、新たにテストを作成してください。
-
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph
 
