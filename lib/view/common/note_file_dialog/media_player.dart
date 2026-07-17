@@ -95,7 +95,7 @@ class MediaPlayerState extends ConsumerState<MediaPlayer>
           if (!mounted || isErrorDialogShown) return;
           isErrorDialogShown = true;
           await ref
-              .read(dialogStateNotifierProvider.notifier)
+              .read(dialogStateProvider.notifier)
               .showSimpleDialog(
                 message: (context) => S.of(context).thrownError,
               );
