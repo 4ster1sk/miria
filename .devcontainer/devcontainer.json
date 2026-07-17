@@ -1,0 +1,46 @@
+{
+  "name": "Miria Flutter",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "FLUTTER_VERSION": "3.32.5",
+      "FVM_VERSION": "4.1.2"
+    }
+  },
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspaces/miria",
+  "containerEnv": {
+    "ANDROID_HOME": "/opt/android-sdk",
+    "ANDROID_SDK_ROOT": "/opt/android-sdk",
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "PUB_CACHE": "/home/vscode/.pub-cache",
+    "FVM_CACHE_PATH": "/home/vscode/fvm",
+    "ADB_SERVER_SOCKET": "tcp:host.docker.internal:5037",
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "GIT_TERMINAL_PROMPT": "0"
+  },
+  "remoteEnv": {
+    "PATH": "/home/vscode/fvm/bin:/home/vscode/fvm/default/bin:/home/vscode/fvm/default/bin/cache/dart-sdk/bin:/home/vscode/.pub-cache/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:${containerEnv:PATH}"
+  },
+  "runArgs": [
+    "--add-host=host.docker.internal:host-gateway"
+  ],
+  "mounts": [
+    "source=miria-pub-cache,target=/home/vscode/.pub-cache,type=volume",
+    "source=miria-gradle-cache,target=/home/vscode/.gradle,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.dart-code",
+        "Dart-Code.flutter"
+      ],
+      "settings": {
+        "dart.flutterSdkPath": "/home/vscode/fvm/default",
+        "dart.lineLength": 80
+      }
+    }
+  },
+  "postCreateCommand": "fvm use -f --skip-pub-get && fvm flutter pub get",
+  "postStartCommand": "flutter config --enable-linux-desktop >/dev/null 2>&1 || true"
+}
