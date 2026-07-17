@@ -43,6 +43,11 @@ abstract class SocketTimelineRepository extends TimelineRepository {
   StreamSubscription<StreamingResponse>? timelineSubscription;
   StreamSubscription<StreamingResponse>? mainSubscription;
 
+  /// disconnect / dispose のたびに増え、飛翔中の startTimeLine を無効化する。
+  int _connectionEpoch = 0;
+  Future<void>? _startInFlight;
+  int? _startInFlightEpoch;
+
   SocketTimelineRepository(
     this.misskey,
     this.account,
@@ -51,6 +56,13 @@ abstract class SocketTimelineRepository extends TimelineRepository {
     super.tabSetting,
     this.ref,
   );
+
+  bool get _isStreamingActive =>
+      subscribedIds.isNotEmpty &&
+      timelineSubscription != null &&
+      mainSubscription != null;
+
+  bool _isCurrentEpoch(int epoch) => epoch == _connectionEpoch;
 
   Future<Iterable<Note>> requestNotes({String? untilId});
   void reloadLatestNotes() {
@@ -87,17 +99,50 @@ abstract class SocketTimelineRepository extends TimelineRepository {
 
   @override
   Future<void> startTimeLine() async {
+    final epoch = _connectionEpoch;
+
+    // 同一世代の start が進行中なら合流し、二重に addChannel しない
+    final inFlight = _startInFlight;
+    if (inFlight != null && _startInFlightEpoch == epoch) {
+      await inFlight;
+      return;
+    }
+
+    final future = _doStartTimeLine(epoch);
+    _startInFlight = future;
+    _startInFlightEpoch = epoch;
+    try {
+      await future;
+    } finally {
+      if (identical(_startInFlight, future)) {
+        _startInFlight = null;
+        _startInFlightEpoch = null;
+      }
+    }
+  }
+
+  Future<void> _doStartTimeLine(int epoch) async {
     try {
       await emojiRepository.loadFromSourceIfNeed();
+      if (!_isCurrentEpoch(epoch)) return;
       // api/iおよびapi/metaはawaitしない
       unawaited(accountRepository.loadFromSourceIfNeed(tabSetting.acct));
       isLoading = false;
       error = null;
       notifyListeners();
     } catch (e, s) {
+      if (!_isCurrentEpoch(epoch)) return;
       error = (e, s);
       isLoading = false;
       notifyListeners();
+    }
+
+    if (!_isCurrentEpoch(epoch)) return;
+
+    // 既に同一世代で購読済みなら再 subscribe しない（冪等）
+    if (_isStreamingActive) {
+      await _loadInitialNotes(epoch);
+      return;
     }
 
     if (misskey.streamingService.isClosed) {
@@ -109,37 +154,59 @@ abstract class SocketTimelineRepository extends TimelineRepository {
         misskeyStreamingProvider(misskey).future,
       );
     }
-    await _listenStreaming();
-    await Future.wait([
-      Future(() async {
-        if (olderNotes.isEmpty) {
-          try {
-            final resultNotes = await requestNotes();
-            olderNotes.addAll(resultNotes);
-            notifyListeners();
-          } catch (e, s) {
-            if (kDebugMode) {
-              print(e);
-              print(s);
-            }
-          }
-        } else {
-          reloadLatestNotes();
+    if (!_isCurrentEpoch(epoch)) return;
+
+    await _listenStreaming(epoch);
+    if (!_isCurrentEpoch(epoch)) return;
+
+    await _loadInitialNotes(epoch);
+  }
+
+  Future<void> _loadInitialNotes(int epoch) async {
+    if (olderNotes.isEmpty) {
+      try {
+        final resultNotes = await requestNotes();
+        if (!_isCurrentEpoch(epoch)) return;
+        olderNotes.addAll(resultNotes);
+        notifyListeners();
+      } catch (e, s) {
+        if (kDebugMode) {
+          print(e);
+          print(s);
         }
-      }),
-    ]);
+      }
+    } else {
+      reloadLatestNotes();
+    }
   }
 
   @override
   Future<void> disconnect() async {
-    if (streamingController != null) {
-      for (var i = subscribedIds.length - 1; i >= 0; i--) {
-        await streamingController!.removeChannel(subscribedIds[i]);
-        subscribedIds.removeAt(i);
+    // 飛翔中の startTimeLine / _listenStreaming を無効化してから購読解除する
+    _connectionEpoch++;
+    await _teardownChannels();
+  }
+
+  Future<void> _teardownChannels() async {
+    final controller = streamingController;
+    final ids = List<String>.of(subscribedIds);
+    subscribedIds.clear();
+    timelineId = null;
+    mainId = null;
+
+    final timelineSub = timelineSubscription;
+    final mainSub = mainSubscription;
+    timelineSubscription = null;
+    mainSubscription = null;
+
+    await timelineSub?.cancel();
+    await mainSub?.cancel();
+
+    if (controller != null) {
+      for (final id in ids) {
+        await controller.removeChannel(id);
       }
     }
-    await timelineSubscription?.cancel();
-    await mainSubscription?.cancel();
   }
 
   @override
@@ -147,30 +214,33 @@ abstract class SocketTimelineRepository extends TimelineRepository {
     if (isReconnecting) return;
     isReconnecting = true;
     try {
-      await (
-        disconnect(),
-        timelineSubscription?.cancel() ?? Future.value(),
-        mainSubscription?.cancel() ?? Future.value(),
-      ).wait;
-    } catch (e) {
-      print(e);
-    }
+      await disconnect();
+      final epoch = _connectionEpoch;
 
-    try {
-      await (
-        () async {
-          await misskey.streamingService.reconnect();
-          await _listenStreaming();
-        }(),
-        () async {
-          reloadLatestNotes();
-        }(),
-      ).wait;
+      await misskey.streamingService.reconnect();
+      if (!_isCurrentEpoch(epoch)) return;
+
+      if (misskey.streamingService.isClosed) {
+        streamingController = await ref.refresh(
+          misskeyStreamingProvider(misskey).future,
+        );
+      } else {
+        streamingController = await ref.read(
+          misskeyStreamingProvider(misskey).future,
+        );
+      }
+      if (!_isCurrentEpoch(epoch)) return;
+
+      await _listenStreaming(epoch);
+      if (!_isCurrentEpoch(epoch)) return;
+
+      reloadLatestNotes();
       error = null;
-      isReconnecting = false;
       notifyListeners();
     } catch (e, s) {
       error = (e, s);
+      notifyListeners();
+    } finally {
       isReconnecting = false;
       notifyListeners();
     }
@@ -191,15 +261,9 @@ abstract class SocketTimelineRepository extends TimelineRepository {
 
   @override
   void dispose() {
+    _connectionEpoch++;
     super.dispose();
-    unawaited(() async {
-      if (streamingController != null) {
-        for (var i = subscribedIds.length - 1; i >= 0; i--) {
-          await streamingController!.removeChannel(subscribedIds[i]);
-          subscribedIds.removeAt(i);
-        }
-      }
-    }());
+    unawaited(_teardownChannels());
   }
 
   @override
@@ -261,27 +325,42 @@ abstract class SocketTimelineRepository extends TimelineRepository {
     streamingController?.unsubNote(id);
   }
 
-  Future<void> _listenStreaming() async {
-    // 特定条件下でuseEffect内でdisconnectが呼ばれないことがある。謎
-    if (subscribedIds.isNotEmpty) {
-      await disconnect();
+  Future<void> _listenStreaming(int epoch) async {
+    // 既存購読があれば閉じてから開き直す（ID上書きによる取りこぼし防止）
+    if (subscribedIds.isNotEmpty ||
+        timelineSubscription != null ||
+        mainSubscription != null) {
+      await _teardownChannels();
     }
+    if (!_isCurrentEpoch(epoch)) return;
 
     final generatedId = const Uuid().v4();
-    timelineId = generatedId;
     final generatedId2 = const Uuid().v4();
+    timelineId = generatedId;
     mainId = generatedId2;
-
     subscribedIds
       ..add(generatedId)
       ..add(generatedId2);
 
-    timelineSubscription = streamingController
-        ?.addChannel(channel, parameters, generatedId)
+    final controller = streamingController;
+    if (controller == null) {
+      subscribedIds.clear();
+      timelineId = null;
+      mainId = null;
+      return;
+    }
+
+    timelineSubscription = controller
+        .addChannel(channel, parameters, generatedId)
         .listen(listenTimeline);
-    mainSubscription = streamingController
-        ?.mainStream(id: generatedId2)
+    mainSubscription = controller
+        .mainStream(id: generatedId2)
         .listen(listenMain);
+
+    // addChannel 直後に disconnect された場合は今開いた購読を破棄する
+    if (!_isCurrentEpoch(epoch)) {
+      await _teardownChannels();
+    }
   }
 
   Future<void> listenMain(StreamingResponse response) async {
