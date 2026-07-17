@@ -31,7 +31,10 @@ fvm dart format --output=none --set-exit-if-changed .
 # iOS (リリース)
 fvm flutter build ipa --no-tree-shake-icons --release --no-codesign
 
-# Android APK
+# Android APK (recommended for smaller per-ABI APKs)
+fvm flutter build apk --no-tree-shake-icons --release --split-per-abi
+
+# Android APK (fat APK with all ABIs)
 fvm flutter build apk --no-tree-shake-icons --release
 
 # Android AAB
