@@ -41,6 +41,6 @@
       }
     }
   },
-  "postCreateCommand": "fvm use -f --skip-pub-get && fvm flutter pub get",
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gradle /home/vscode/.pub-cache && fvm use -f --skip-pub-get && fvm flutter pub get",
   "postStartCommand": "flutter config --enable-linux-desktop >/dev/null 2>&1 || true"
 }
