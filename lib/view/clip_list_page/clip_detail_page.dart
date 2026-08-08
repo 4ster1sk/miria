@@ -10,6 +10,23 @@ import "package:miria/router/app_router.dart";
 import "package:miria/state_notifier/clip_list_page/clips_notifier.dart";
 import "package:miria/view/clip_list_page/clip_detail_note_list.dart";
 import "package:miria/view/common/account_scope.dart";
+import "package:misskey_dart/misskey_dart.dart";
+import "package:riverpod_annotation/riverpod_annotation.dart";
+
+part "clip_detail_page.g.dart";
+
+/// クリップの情報を clips/show で取得する。
+///
+/// 自分のクリップ一覧（clipsProvider）にないクリップ（リモートユーザーのクリップや
+/// 一覧の先頭ページに載っていない自分のクリップ）のタイトル等に使う。
+/// clips/show は requireCredential: false のため、デモアカウントでも取得できる。
+@Riverpod(dependencies: [misskeyGetContext])
+Future<Clip> _clipShow(Ref ref, String clipId) async {
+  return await ref
+      .read(misskeyGetContextProvider)
+      .clips
+      .show(ClipsShowRequest(clipId: clipId));
+}
 
 @RoutePage()
 class ClipDetailPage extends HookConsumerWidget implements AutoRouteWrapper {
@@ -27,11 +44,16 @@ class ClipDetailPage extends HookConsumerWidget implements AutoRouteWrapper {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clip = ref.watch(
-      clipsProvider.select(
-        (clips) => clips.value?.firstWhereOrNull((e) => e.id == id),
-      ),
-    );
+    final clips = ref.watch(clipsProvider);
+    final ownClip = clips.value?.firstWhereOrNull((e) => e.id == id);
+    // clips/list は要認証のためデモアカウントでは失敗する。Riverpod は失敗時に
+    // リトライするが、その間も isLoading のままになるので、エラー付きローディングの
+    // 状態では待たずに clips/show へフォールバックする。
+    final clip = clips.isLoading && !clips.hasError
+        ? null
+        : ownClip ?? ref.watch(_clipShowProvider(id)).value;
+    final isOwn =
+        clip?.userId == ref.read(accountContextProvider).postAccount.userId;
     final updateClip = useAsync(() async {
       final target = clip;
       if (target == null) return;
@@ -49,7 +71,7 @@ class ClipDetailPage extends HookConsumerWidget implements AutoRouteWrapper {
       appBar: AppBar(
         title: Text(clip?.name ?? ""),
         actions: [
-          if (clip != null)
+          if (isOwn)
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: updateClip.executeOrNull,
