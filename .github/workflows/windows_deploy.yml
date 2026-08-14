@@ -2,6 +2,8 @@ name: デプロイ(windows)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "claude/miria-v4-artifact-check-ayxc7k" ]
   release:
     types: [published]
 
@@ -63,4 +65,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload v${env:version}  miria_${env:version}_windows-x64.zip miria-installer_${env:version}_x64.exe
+          Get-ChildItem miria_${env:version}_windows-x64.zip, miria-installer_${env:version}_x64.exe | Format-List Name, Length
