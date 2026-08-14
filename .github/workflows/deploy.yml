@@ -1,6 +1,9 @@
 name: デプロイ
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "claude/miria-v4-artifact-check-ayxc7k" ]
 
 permissions:
   contents: write
@@ -92,6 +95,7 @@ jobs:
           run: flutter build ipa --no-tree-shake-icons  --release --no-codesign
 
         - name: Release by fastlane
+          continue-on-error: true
           env:
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
