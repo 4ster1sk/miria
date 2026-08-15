@@ -43,13 +43,17 @@ class PushableListView<T> extends HookConsumerWidget {
     final isFinalPage = useState(false);
     final scrollController = useScrollController();
     final items = useState<List<T>>([]);
+    final initializeToken = useRef(0);
 
     final initialize = useCallback(() async {
+      final token = initializeToken.value + 1;
+      initializeToken.value = token;
       isLoading.value = true;
       isFinalPage.value = false;
       items.value = [];
       try {
         final initialItems = await initializeFuture();
+        if (token != initializeToken.value) return;
         items.value = initialItems;
         isLoading.value = false;
         await scrollController.animateTo(
@@ -58,6 +62,7 @@ class PushableListView<T> extends HookConsumerWidget {
           curve: Curves.easeIn,
         );
       } catch (e, s) {
+        if (token != initializeToken.value) return;
         if (kDebugMode) print(e);
         error.value = (e, s);
         isLoading.value = false;
