@@ -335,6 +335,8 @@
     "renotedUsersInNotification": "リノートしてくれはった人",
     "reactionUsersInNotification": "リアクションしてくれはった人",
     "finishedVotedNotification": "投票が終わったみたいや",
+    "scheduledNotePostedNotification": "予約投稿がノートされたで",
+    "scheduledNotePostFailedNotification": "予約投稿がしくじったみたいや",
     "renoteAndReactionsNotification": "{reactionUser}さんたちがリアクションしはって、{renotedUser}さんたちがリノートしはったで",
     "@renoteAndReactionsNotification": {
         "placeholders": {
@@ -1044,6 +1046,8 @@
     },
     "failedFileSave": "ファイルの保存に失敗したみたいや",
 
+    "loopPlayback": "ループ再生",
+
     "misskeyGames": "Misskey Games",
     "cookieCliker": "Cookie Cliker",
     "bubbleGame": "Bubble Game",
@@ -1085,6 +1089,7 @@
     "chat": "チャット",
     "chatInvitation": "招待",
     "chatOwnRooms": "自分で作ったやつ",
+    "chatJoining": "入ってるルーム",
     "chatNewChat": "新しいチャットを開始",
     "chatIgnored": "無視したで",
     "chatNoDescription": "説明はありません",
@@ -1096,7 +1101,8 @@
     "chatRoomDescription": "説明",
     "chatUpdate": "更新",
     "chatDelete": "削除する",
-    "chatCreator": "チャット立てた人",
+    "chatCreator": "チャットを立てた人",
+    "confirmChatLeave": "ほんまにチャットから退出してええな？",
     "chatLeave": "チャットから退出",
     "chatLeftRoom": "チャットから退出したで",
     "chatRetry": "再試行",
@@ -1111,6 +1117,7 @@
     "chatReactionList": "リアクション一覧",
     "chatUnknownUser": "Unknown User",
     "chatNsfw": "NSFW",
+    "chatUpdateCompleted": "更新できたみたいや",
 
     "chatRoomInvitation": "チャットルームに招待されたで【{roomName}】",
     "@chatRoomInvitation": {
