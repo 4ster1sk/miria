@@ -69,7 +69,7 @@ jobs:
 
         - name: Create split APKs (arm64-v8a / x86_64, 32bit除外)
           run: |
-            echo -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode --output ./android/release.keystore
+            echo -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./android/release.keystore
             export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
             export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
             export ANDROID_KEY_PASSWORD="${{ secrets.ANDROID_KEY_PASSWORD }}"
