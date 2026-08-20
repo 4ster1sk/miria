@@ -1,0 +1,92 @@
+name: デプロイ(APK分割)
+
+on: [workflow_dispatch]
+
+permissions:
+  contents: write
+
+env:
+  GIT_USER_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
+  GIT_USER_NAME: 'github-actions[bot]'
+
+jobs:
+  build_apk:
+    name: Android APK (arm64 / x86_64)
+    runs-on: ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v4
+
+        - name: Get Flutter version from .fvmrc
+          run: echo "FLUTTER_FVM_VERSION=$(jq -r .flutter .fvmrc)" >> $GITHUB_ENV
+
+        - name: Install flutter
+          uses: subosito/flutter-action@v2
+          with:
+            flutter-version: ${{ env.FLUTTER_FVM_VERSION }}
+            cache: true
+
+        - uses: actions/setup-java@v4
+          with:
+            distribution: 'zulu'
+            java-version: '21'
+            cache: 'gradle'
+
+        - name: Cache pubspec dependencies
+          uses: actions/cache@v4
+          with:
+            path: |
+              ${{ env.FLUTTER_HOME }}/.pub-cache
+              **/.packages
+              **/.flutter-plugins
+              **/.flutter-plugin-dependencies
+              **/.dart_tool/package_config.json
+            key: build-apk-pubspec-${{ hashFiles('**/pubspec.lock') }}
+            restore-keys: |
+              build-apk-pubspec-
+
+        - name: Flutter pub get
+          run: flutter pub get
+
+        - name: Initialize git config
+          run: |
+            git config --local user.name $GIT_USER_NAME
+            git config --local user.email $GIT_USER_EMAIL
+
+        - name: Bump up version
+          run: |
+            flutter pub run cider bump build --bump-build
+            echo "BUMP_VERSION=$(flutter pub run cider version)" >> $GITHUB_ENV
+
+        - name: Commit and push pubspec.yaml
+          run: |
+              git add -u pubspec.yaml
+              echo "Bumped version number to $BUMP_VERSION" | git commit --file=-
+              git push
+
+        - name: Run flutter test with coverage
+          run: flutter test --coverage --coverage-path=~/coverage/lcov.info
+
+        - name: Create split APKs (arm64-v8a / x86_64, 32bit除外)
+          run: |
+            echo -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode --output ./android/release.keystore
+            export ANDROID_KEYSTORE_PASSWORD="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            export ANDROID_KEY_ALIAS="${{ secrets.ANDROID_KEY_ALIAS }}"
+            export ANDROID_KEY_PASSWORD="${{ secrets.ANDROID_KEY_PASSWORD }}"
+            # 32bit(armeabi-v7a)は除外。arm64とx86_64のみを分割ビルド
+            flutter build apk --no-tree-shake-icons --release --split-per-abi
+            ls -lh ./build/app/outputs/flutter-apk/
+            # 分割結果: app-arm64-v8a-release.apk / app-x86_64-release.apk / app-armeabi-v7a-release.apk
+            # 32bitは配布不要なので削除
+            rm -f ./build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            mv ./build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ./build/app/outputs/flutter-apk/miria-$BUMP_VERSION-arm64-v8a.apk
+            mv ./build/app/outputs/flutter-apk/app-x86_64-release.apk ./build/app/outputs/flutter-apk/miria-$BUMP_VERSION-x86_64.apk
+            ls -lh ./build/app/outputs/flutter-apk/
+
+        - name: Create tag and release note (split APKs)
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            gh release create v$BUMP_VERSION --generate-notes --draft \
+              ./build/app/outputs/flutter-apk/miria-$BUMP_VERSION-arm64-v8a.apk \
+              ./build/app/outputs/flutter-apk/miria-$BUMP_VERSION-x86_64.apk
