@@ -38,6 +38,7 @@ class _UserPageState extends ConsumerState<UserPage>
   TabController? _tabController;
   List<UserPageTab> _tabs = [];
   List<UserPageTab>? _pendingTabs;
+  final List<TabController> _oldControllers = [];
 
   @override
   void initState() {
@@ -51,11 +52,21 @@ class _UserPageState extends ConsumerState<UserPage>
   }
 
   void _createController({required int initialIndex, double? initialValue}) {
-    // 既存のリスナーを外してから dispose
+    // 既存のリスナーだけ外し、disposeは次フレームまで遅延させる。
+    // TabBar/TabBarView が didUpdateWidget で旧controllerからリスナーを外す前に
+    // dispose すると _DragAnimation.parent が null になり
+    // indicator の paint でクラッシュするため。
     if (_tabController != null) {
       _tabController!.removeListener(_handleControllerTick);
       _tabController!.animation?.removeListener(_handleAnimationTick);
-      _tabController!.dispose();
+      final old = _tabController!;
+      _oldControllers.add(old);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // 既にdisposeされていたり、再利用されていないか確認
+        if (_oldControllers.remove(old)) {
+          old.dispose();
+        }
+      });
     }
     _tabController = TabController(
       vsync: this,
@@ -151,6 +162,10 @@ class _UserPageState extends ConsumerState<UserPage>
       _tabController!.animation?.removeListener(_handleAnimationTick);
       _tabController!.dispose();
     }
+    for (final c in _oldControllers) {
+      c.dispose();
+    }
+    _oldControllers.clear();
     super.dispose();
   }
 
