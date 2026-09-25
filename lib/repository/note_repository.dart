@@ -103,9 +103,12 @@ class NoteRepository extends ChangeNotifier {
       }
     }
 
-    if ((note.user.host != null || note.user.id != account.i.id) &&
-            hardMuteWordContents.any((e) => e.every(isMuteTarget)) ||
-        hardMuteWordRegExps.any(isMuteTarget)) {
+    // 自分のノートはワードミュート・正規表現ミュートのどちらも対象外
+    final isOthersNote = note.user.host != null || note.user.id != account.i.id;
+
+    if (isOthersNote &&
+        (hardMuteWordContents.any((e) => e.every(isMuteTarget)) ||
+            hardMuteWordRegExps.any(isMuteTarget))) {
       return;
     }
 
@@ -127,9 +130,9 @@ class NoteRepository extends ChangeNotifier {
       isReactionedRenote: false,
       isLongVisibleInitialized: false,
       isIncludeMuteWord:
-          (note.user.host != null || note.user.id != account.i.id) &&
-              softMuteWordContents.any((e) => e.every(isMuteTarget)) ||
-          softMuteWordRegExps.any(isMuteTarget),
+          isOthersNote &&
+          (softMuteWordContents.any((e) => e.every(isMuteTarget)) ||
+              softMuteWordRegExps.any(isMuteTarget)),
       isMuteOpened: false,
     );
     final renote = note.renote;
