@@ -51,6 +51,12 @@ class AlreadyLoggedInException implements ValidateMisskeyException {
   final String acct;
 }
 
+/// MiAuthで要求する権限。管理者向けの権限は要求しない。
+@visibleForTesting
+final miAuthPermissions = Permission.values
+    .where((p) => !p.value.contains(":admin:"))
+    .toList();
+
 @riverpod
 class AccountRepository extends _$AccountRepository {
   late final SharedPreferenceController sharedPreferenceController = ref.read(
@@ -66,7 +72,7 @@ class AccountRepository extends _$AccountRepository {
   String _buildHttpMiAuthUrl(Uri uri, String sessionId) {
     final baseUrl =
         "${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}";
-    final permissions = Permission.values.map((p) => p.value).join(",");
+    final permissions = miAuthPermissions.map((p) => p.value).join(",");
     return "$baseUrl/miauth/$sessionId?name=Miria&permission=$permissions";
   }
 
@@ -421,7 +427,7 @@ class AccountRepository extends _$AccountRepository {
             uri.host,
             _sessionId,
             name: "Miria",
-            permission: Permission.values,
+            permission: miAuthPermissions,
           );
 
     await launchUrl(
