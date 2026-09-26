@@ -17,20 +17,9 @@ part of 'clip_detail_page.dart';
 @ProviderFor(_clipShow)
 final _clipShowProvider = _ClipShowFamily._();
 
-/// クリップの情報を clips/show で取得する。
-///
-/// 自分のクリップ一覧（clipsProvider）にないクリップ（リモートユーザーのクリップや
-/// 一覧の先頭ページに載っていない自分のクリップ）のタイトル等に使う。
-/// clips/show は requireCredential: false のため、デモアカウントでも取得できる。
-
 final class _ClipShowProvider
     extends $FunctionalProvider<AsyncValue<Clip>, Clip, FutureOr<Clip>>
     with $FutureModifier<Clip>, $FutureProvider<Clip> {
-  /// クリップの情報を clips/show で取得する。
-  ///
-  /// 自分のクリップ一覧（clipsProvider）にないクリップ（リモートユーザーのクリップや
-  /// 一覧の先頭ページに載っていない自分のクリップ）のタイトル等に使う。
-  /// clips/show は requireCredential: false のため、デモアカウントでも取得できる。
   _ClipShowProvider._({
     required _ClipShowFamily super.from,
     required String super.argument,
@@ -80,12 +69,6 @@ final class _ClipShowProvider
 
 String _$_clipShowHash() => r'517299596c32748aee322271fd1ca209c0c87f70';
 
-/// クリップの情報を clips/show で取得する。
-///
-/// 自分のクリップ一覧（clipsProvider）にないクリップ（リモートユーザーのクリップや
-/// 一覧の先頭ページに載っていない自分のクリップ）のタイトル等に使う。
-/// clips/show は requireCredential: false のため、デモアカウントでも取得できる。
-
 final class _ClipShowFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Clip>, String> {
   _ClipShowFamily._()
@@ -99,12 +82,6 @@ final class _ClipShowFamily extends $Family
         ],
         isAutoDispose: true,
       );
-
-  /// クリップの情報を clips/show で取得する。
-  ///
-  /// 自分のクリップ一覧（clipsProvider）にないクリップ（リモートユーザーのクリップや
-  /// 一覧の先頭ページに載っていない自分のクリップ）のタイトル等に使う。
-  /// clips/show は requireCredential: false のため、デモアカウントでも取得できる。
 
   _ClipShowProvider call(String clipId) =>
       _ClipShowProvider._(argument: clipId, from: this);
