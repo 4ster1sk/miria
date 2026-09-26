@@ -1013,18 +1013,20 @@ packages:
   mfm:
     dependency: "direct main"
     description:
-      name: mfm
-      sha256: "10ed9e7ab347f89d7f93b98b2785b8f153128e2d04b6e0ba27a5eefd2a75fca7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.11"
+      path: "."
+      ref: "tmp/no-default-host"
+      resolved-ref: "3762daf6fac6f4603b01ad84dc5834cd8cd88013"
+      url: "https://github.com/4ster1sk/mfm_renderer.git"
+    source: git
+    version: "1.0.11+2"
   mfm_parser:
     dependency: "direct main"
     description:
-      name: mfm_parser
-      sha256: e5e71bc5d2e67b28cc5b9196505db22e6597aab8b1868cdf937489a9958c0bcc
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "1bcb3380cbcbd7af3bc97b04df74f6bf098a70d9"
+      url: "https://github.com/4ster1sk/dart_mfm_parser.git"
+    source: git
     version: "1.0.7"
   mime:
     dependency: "direct main"

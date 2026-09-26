@@ -98,6 +98,18 @@ dependencies:
       ref: main
 
 dependency_overrides:
+  # PR マージまでの一時的な override
+  # https://github.com/4ster1sk/dart_mfm_parser (閉じの無い構文のパースが O(n^2) になる問題の修正)
+  mfm_parser:
+    git:
+      url: https://github.com/4ster1sk/dart_mfm_parser.git
+      ref: main
+  # Mfm の再ビルドコスト削減 (PR: https://git.tomadoi.com/misskey/mfm_renderer/pulls/1)
+  # upstream (shiosyakeyakini-info/mfm_renderer) の main をベースにしたブランチ。
+  mfm:
+    git:
+      url: https://github.com/4ster1sk/mfm_renderer.git
+      ref: tmp/no-default-host
   image_editor:
     git:
       url: https://github.com/shiosyakeyakini-info/flutter_image_editor_fix_ios_color_option.git
